@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import "../styles/globals.css"
 
 export default function RootLayout({
   children,
@@ -9,7 +10,7 @@ export default function RootLayout({
     const header = (
         <header>
             <div>
-                <Link href={"/"}>
+                <Link href={"/public"}>
                     <h1>Blog</h1>
                 </Link>
                 <p>Welcome</p>
