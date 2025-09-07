@@ -1,8 +1,7 @@
 import type { GetStaticProps, GetStaticPaths, NextPage } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
-import { getAllPostIds, getPostData, PostData } from '../../lib/posts';
-import styles from '../../styles/Home.module.css';
+import { getAllPostIds, getPostData, PostData } from '@/lib/posts';
 
 type PostProps = {
     postData: PostData;
@@ -10,26 +9,25 @@ type PostProps = {
 
 const Post: NextPage<PostProps> = ({ postData }) => {
     return (
-        <div className={styles.container}>
+        <div className="bg-white dark:bg-neutral-800 p-6 sm:p-8 rounded-2xl">
             <Head>
                 <title>{postData.title}</title>
             </Head>
 
-            <header className={styles.header}>
-                <h1>{postData.title}</h1>
-                <div className={styles.lightText}>{postData.date}</div>
+            <header className="mb-8">
+                <h1 className="text-4xl font-extrabold text-black dark:text-white mb-2">{postData.title}</h1>
+                <div className="text-neutral-500 dark:text-neutral-400">{postData.date}</div>
             </header>
 
-            <main>
-                <article>
-                    <div dangerouslySetInnerHTML={{ __html: postData.contentHtml! }} />
-                </article>
-                <div className={styles.backToHome}>
-                    <Link href="/">
-                        ← Back to home
-                    </Link>
-                </div>
-            </main>
+            <article className="prose prose-lg dark:prose-invert max-w-none">
+                <div dangerouslySetInnerHTML={{ __html: postData.contentHtml! }} />
+            </article>
+
+            <div className="mt-12">
+                <Link href="/" className="text-fuchsia-500 hover:text-fuchsia-600">
+                    ← Back to home
+                </Link>
+            </div>
         </div>
     );
 };

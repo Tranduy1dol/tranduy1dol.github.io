@@ -1,51 +1,42 @@
 import type { GetStaticProps, NextPage } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
-import { getSortedPostsData, PostData } from '../lib/posts';
-import styles from '../styles/Home.module.css';
+import { getSortedPostsData, PostData } from '@/lib/posts';
 
 type HomeProps = {
-  allPostsData: PostData[];
+    allPostsData: PostData[];
 };
 
 const Home: NextPage<HomeProps> = ({ allPostsData }) => {
-  return (
-      <div className={styles.container}>
-        <Head>
-          <title>My Minimal Next.js Blog</title>
-        </Head>
+    return (
+        <>
+            <Head>
+                <title>My Minimal Next.js Blog</title>
+            </Head>
 
-        <header className={styles.header}>
-          <h1>My Minimal Blog</h1>
-        </header>
-
-        <main>
-          <section>
-            <h2>Blog Posts</h2>
-            <ul className={styles.postList}>
-              {allPostsData.map(({ id, date, title }) => (
-                  <li key={id} className={styles.postListItem}>
-                      <Link href={`/posts/${id}`}>
-                          {title}
-                      </Link>
-                    <br />
-                    <small className={styles.lightText}>{date}</small>
-                  </li>
-              ))}
-            </ul>
-          </section>
-        </main>
-      </div>
-  );
+            <div className="space-y-6">
+                {allPostsData.map(({ id, date, title }) => (
+                    <Link
+                        key={id}
+                        href={`/posts/${id}`}
+                        className="block p-6 bg-white dark:bg-neutral-800 rounded-2xl shadow-sm hover:shadow-md transition-shadow"
+                    >
+                        <h2 className="text-2xl font-bold text-black dark:text-white">{title}</h2>
+                        <p className="text-neutral-500 dark:text-neutral-400 mt-2">{date}</p>
+                    </Link>
+                ))}
+            </div>
+        </>
+    );
 };
 
 export default Home;
 
 export const getStaticProps: GetStaticProps = async () => {
-  const allPostsData = getSortedPostsData();
-  return {
-    props: {
-      allPostsData,
-    },
-  };
+    const allPostsData = getSortedPostsData();
+    return {
+        props: {
+            allPostsData,
+        },
+    };
 };
