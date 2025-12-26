@@ -1,40 +1,57 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+# tranduy1dol
+
+A minimalist, editorial-style personal website and blog built with [Next.js](https://nextjs.org), TypeScript, and Tailwind CSS.
+
+## Features
+
+- **Minimalist Design**: Clean typography-focused layout (Playfair Display & Sans-serif) with dark mode support
+- **Editorial Style**: Headers and layouts inspired by print media
+- **MDX Powered**: Write content in Markdown with `gray-matter` for frontmatter metadata
+- **Dynamic Content**:
+  - **Blog**: Tag filtering, search, and reading time calculation
+  - **Books**: Reading list with star ratings and status
+  - **Spotlight**: Featured projects grid
+  - **Tech Stack**: Infinite marquee animation
+- **Responsive**: Fully responsive design for mobile, tablet, and desktop
+- **SEO Optimized**: Meta tags, semantic HTML, and proper heading hierarchy
+
+## Tech Stack
+
+- **Framework**: Next.js (Pages Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS + Custom CSS Variables
+- **Icons**: React Icons
+- **Content**: Markdown (remark/rehype)
 
 ## Getting Started
 
-First, run the development server:
+1.  **Clone the repository**:
+    ```bash
+    git clone https://github.com/tranduy1dol/tranduy1dol.github.io.git
+    cd tranduy1dol.github.io
+    ```
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+2.  **Install dependencies**:
+    ```bash
+    npm install
+    ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+3.  **Run development server**:
+    ```bash
+    npm run dev
+    ```
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+    Open [http://localhost:3000](http://localhost:3000) to view the site.
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+## Content Management
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+- **Blog Posts**: Add `.md` files to `_posts/`
+- **Books**: Add `.md` files to `_books/`
+- **Spotlight Projects**: Add `.md` files to `_content/spotlight/`
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Deployment
 
-## Learn More
+This project is configured for deployment on **GitHub Pages** via GitHub Actions.
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+- The workflow file is located at `.github/workflows/deploy.yml`.
+- Pushes to the `main` branch automatically trigger a build and deploy.

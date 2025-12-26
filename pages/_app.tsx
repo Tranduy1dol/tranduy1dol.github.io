@@ -5,11 +5,11 @@ import Layout from '../components/Layout'
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
-      <ThemeProvider attribute="class">
-        <Layout>
-          <Component {...pageProps} />
-        </Layout>
-      </ThemeProvider>
+    <ThemeProvider attribute="class" defaultTheme="light">
+      <Layout>
+        <Component {...pageProps} />
+      </Layout>
+    </ThemeProvider>
   )
 }
 

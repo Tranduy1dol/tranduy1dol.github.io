@@ -1,40 +1,121 @@
 @import "tailwindcss";
 
+/* Google Fonts - Playfair Display */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+
+/* Design System Variables */
+:root {
+  --color-bg: 250 248 245;
+  --color-surface: 245 242 238;
+  --color-border: 60 56 54;
+  --color-text: 28 25 23;
+  --color-text-muted: 87 83 78;
+  --color-accent: 68 64 60;
+
+  --font-serif: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Dark theme variables */
+.dark {
+  --color-bg: 28 25 23;
+  --color-surface: 41 37 36;
+  --color-border: 168 162 158;
+  --color-text: 245 245 244;
+  --color-text-muted: 168 162 158;
+  --color-accent: 214 211 209;
+}
+
+/* Base Styles */
 html,
 body {
   padding: 0;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-  Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  font-family: var(--font-sans);
   line-height: 1.6;
-  font-size: 18px;
-  background-color: #fdfdfd;
-  color: #333;
+  font-size: 16px;
+  background-color: rgb(var(--color-bg));
+  color: rgb(var(--color-text));
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 * {
   box-sizing: border-box;
 }
 
+/* Border color for all elements */
+* {
+  border-color: rgb(var(--color-border));
+}
+
+/* Typography - Headings */
+h1 {
+  font-family: var(--font-serif);
+  font-size: 4rem;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+h2 {
+  font-family: var(--font-serif);
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+h3 {
+  font-family: var(--font-serif);
+  font-size: 1.75rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+h4 {
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.4;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* Paragraph */
+p {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: rgb(var(--color-text));
+}
+
+/* Links */
 a {
-  color: #0070f3;
-  text-decoration: none;
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+  transition: color 0.15s ease, opacity 0.15s ease;
 }
 
 a:hover {
-  text-decoration: underline;
+  color: rgb(var(--color-text-muted));
 }
 
+/* Images */
 img {
   max-width: 100%;
   display: block;
 }
 
-pre, code {
-  font-family: monospace, monospace;
-  background-color: #f4f4f4;
+/* Code */
+pre,
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background-color: rgb(var(--color-surface));
   border-radius: 4px;
   padding: 0.2em 0.4em;
+  font-size: 0.9em;
 }
 
 pre {
@@ -44,4 +125,137 @@ pre {
 
 pre code {
   padding: 0;
+  background: transparent;
+}
+
+/* Blockquote */
+blockquote {
+  font-family: var(--font-serif);
+  font-style: italic;
+  border-left: 2px solid rgb(var(--color-border));
+  padding-left: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+/* Lists */
+ul,
+ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Prose styles for blog content */
+.prose h2 {
+  font-family: var(--font-serif);
+  font-size: 2rem;
+  font-weight: 700;
+  margin-top: 3rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid rgb(var(--color-border));
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.prose h2::before {
+  content: '§';
+  font-size: 1.5rem;
+  opacity: 0.4;
+}
+
+.prose h3 {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  color: rgb(var(--color-text));
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.prose h3::before {
+  content: '—';
+  opacity: 0.4;
+}
+
+.prose h4 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgb(var(--color-text-muted));
+}
+
+.prose p {
+  margin-bottom: 1.25rem;
+}
+
+.prose ul,
+.prose ol {
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+}
+
+.prose ul {
+  list-style-type: disc;
+}
+
+.prose ol {
+  list-style-type: decimal;
+}
+
+.prose li {
+  margin-bottom: 0.5rem;
+}
+
+.prose a {
+  color: rgb(var(--color-text));
+  text-decoration: underline;
+}
+
+.prose a:hover {
+  color: rgb(var(--color-text-muted));
+}
+
+.prose blockquote {
+  font-size: 1.125rem;
+}
+
+.prose img {
+  margin: 2rem 0;
+  border: 2px solid rgb(var(--color-border));
+}
+
+/* Utility classes */
+.no-underline {
+  text-decoration: none;
+}
+
+.font-serif {
+  font-family: var(--font-serif);
+}
+
+.font-sans {
+  font-family: var(--font-sans);
+}
+
+/* Responsive typography */
+@media (max-width: 768px) {
+  h1 {
+    font-size: 2.5rem;
+  }
+
+  h2 {
+    font-size: 1.75rem;
+  }
+
+  h3 {
+    font-size: 1.25rem;
+  }
 }
