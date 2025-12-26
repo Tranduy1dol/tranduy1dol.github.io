@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { GetStaticProps, GetStaticPaths, NextPage } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
@@ -14,19 +14,62 @@ const Post: NextPage<PostProps> = ({ postData }) => {
     const [liked, setLiked] = useState(false);
     const [likeCount, setLikeCount] = useState(0);
     const [copied, setCopied] = useState(false);
+    const [comments, setComments] = useState<string[]>([]);
+    const [commentText, setCommentText] = useState('');
+    const [showComments, setShowComments] = useState(false);
+
+    // Load state from localStorage on mount
+    useEffect(() => {
+        const storedLike = localStorage.getItem(`like-${postData.id}`);
+        if (storedLike === 'true') {
+            setLiked(true);
+            setLikeCount(1);
+        }
+
+        const storedComments = localStorage.getItem(`comments-${postData.id}`);
+        if (storedComments) {
+            setComments(JSON.parse(storedComments));
+        }
+    }, [postData.id]);
+
+    const handleCommentSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!commentText.trim()) return;
+
+        const newComments = [...comments, commentText];
+        setComments(newComments);
+        setCommentText('');
+        localStorage.setItem(`comments-${postData.id}`, JSON.stringify(newComments));
+    };
+
+    const deleteComment = (index: number) => {
+        const newComments = comments.filter((_, i) => i !== index);
+        setComments(newComments);
+        localStorage.setItem(`comments-${postData.id}`, JSON.stringify(newComments));
+    };
+
+    const scrollToComments = () => {
+        const commentSection = document.getElementById('comments-section');
+        if (commentSection) {
+            commentSection.scrollIntoView({ behavior: 'smooth' });
+            setShowComments(true);
+        }
+    };
 
     const formatDate = (dateStr: string) => {
         const date = new Date(dateStr);
         return date.toLocaleDateString('en-US', {
-            month: 'short',
+            month: 'long',
             day: 'numeric',
             year: 'numeric',
         }).toUpperCase();
     };
 
     const handleLike = () => {
-        setLiked(!liked);
-        setLikeCount(liked ? 0 : 1);
+        const newLikedState = !liked;
+        setLiked(newLikedState);
+        setLikeCount(newLikedState ? 1 : 0);
+        localStorage.setItem(`like-${postData.id}`, newLikedState.toString());
     };
 
     const handleShare = async () => {
@@ -43,9 +86,9 @@ const Post: NextPage<PostProps> = ({ postData }) => {
     const headings = postData.headings || [];
 
     return (
-        <Layout>
+        <>
             <Head>
-                <title>{postData.title} - tranduy1dol</title>
+                <title>{`${postData.title} - tranduy1dol`}</title>
                 <meta name="description" content={postData.excerpt} />
             </Head>
 
@@ -110,9 +153,12 @@ const Post: NextPage<PostProps> = ({ postData }) => {
                                 <span className="text-xs" style={{ color: 'rgb(var(--color-text-muted))' }}>Share</span>
                             </button>
 
-                            <button className="flex flex-col items-center gap-2 group cursor-not-allowed opacity-50">
+                            <button
+                                onClick={scrollToComments}
+                                className="flex flex-col items-center gap-2 group transition-transform active:scale-95"
+                            >
                                 <svg
-                                    className="w-5 h-5"
+                                    className="w-5 h-5 transition-all group-hover:fill-current group-hover:text-blue-500"
                                     style={{ color: 'rgb(var(--color-text-muted))' }}
                                     xmlns="http://www.w3.org/2000/svg"
                                     viewBox="0 0 24 24"
@@ -124,7 +170,7 @@ const Post: NextPage<PostProps> = ({ postData }) => {
                                 >
                                     <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" />
                                 </svg>
-                                <span className="text-xs" style={{ color: 'rgb(var(--color-text-muted))' }}>0</span>
+                                <span className="text-xs group-hover:text-blue-500" style={{ color: 'rgb(var(--color-text-muted))' }}>{comments.length}</span>
                             </button>
                         </div>
                     </aside>
@@ -185,6 +231,68 @@ const Post: NextPage<PostProps> = ({ postData }) => {
                                 </li>
                             </ul>
                         </div>
+
+                        {/* Comments Section */}
+                        <div
+                            id="comments-section"
+                            className="border-t-2 mt-12 pt-8 scroll-mt-32"
+                            style={{ borderColor: 'rgb(var(--color-border))' }}
+                        >
+                            <h4 className="mb-6 flex items-center gap-2">
+                                Personal Notes
+                                <span className="text-xs font-normal px-2 py-1 rounded-full bg-gray-100 dark:bg-gray-800" style={{ color: 'rgb(var(--color-text-muted))' }}>
+                                    Private • Stored locally
+                                </span>
+                            </h4>
+
+                            <form onSubmit={handleCommentSubmit} className="mb-8">
+                                <textarea
+                                    value={commentText}
+                                    onChange={(e) => setCommentText(e.target.value)}
+                                    placeholder="Write a note to yourself..."
+                                    className="w-full p-4 rounded-lg border bg-transparent resize-y min-h-[100px] mb-3 focus:outline-none focus:ring-1 focus:ring-gray-400"
+                                    style={{ borderColor: 'rgb(var(--color-border))' }}
+                                />
+                                <button
+                                    type="submit"
+                                    disabled={!commentText.trim()}
+                                    className="px-4 py-2 rounded text-sm font-medium transition-colors disabled:opacity-50"
+                                    style={{
+                                        backgroundColor: 'rgb(var(--color-text))',
+                                        color: 'rgb(var(--color-bg))'
+                                    }}
+                                >
+                                    Add Note
+                                </button>
+                            </form>
+
+                            <div className="space-y-6">
+                                {comments.map((comment, index) => (
+                                    <div key={index} className="group flex gap-4">
+                                        <div className="flex-1">
+                                            <div className="p-4 rounded-lg bg-gray-50 dark:bg-gray-900/50">
+                                                <p className="whitespace-pre-wrap text-sm leading-relaxed">{comment}</p>
+                                            </div>
+                                        </div>
+                                        <button
+                                            onClick={() => deleteComment(index)}
+                                            className="self-start p-2 opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
+                                            title="Delete note"
+                                        >
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                ))}
+
+                                {comments.length === 0 && (
+                                    <p className="text-center italic py-8" style={{ color: 'rgb(var(--color-text-muted))' }}>
+                                        No notes yet.
+                                    </p>
+                                )}
+                            </div>
+                        </div>
                     </article>
 
                     {/* Right Column - Table of Contents (Desktop only) */}
@@ -218,7 +326,7 @@ const Post: NextPage<PostProps> = ({ postData }) => {
                     </aside>
                 </div>
             </div>
-        </Layout>
+        </>
     );
 };
 
