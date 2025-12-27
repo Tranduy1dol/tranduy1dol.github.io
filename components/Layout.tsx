@@ -119,7 +119,7 @@ const Layout = ({ children }: LayoutProps) => {
                         <div>
                             <h3 className="mb-4">tranduy1dol</h3>
                             <p className="text-sm leading-relaxed" style={{ color: 'rgb(var(--color-text-muted))' }}>
-                                Crafting thoughtful software with precision. Based in Vietnam 🇻🇳
+                                Code Alchemist — transmuting ideas into Rust APIs & ZK sorcery. Based in Hanoi, Vietnam 🇻🇳
                             </p>
                         </div>
 

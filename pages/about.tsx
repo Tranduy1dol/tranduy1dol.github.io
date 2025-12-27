@@ -73,14 +73,14 @@ const About: NextPage<AboutProps> = ({ contentHtml, frontMatter, milestones, lat
                                 className="text-sm uppercase tracking-wider mb-4"
                                 style={{ color: 'rgb(var(--color-text-muted))' }}
                             >
-                                Software Developer
+                                Code Alchemist
                             </p>
                             <p
                                 className="text-sm leading-relaxed"
                                 style={{ color: 'rgb(var(--color-text-muted))' }}
                             >
-                                Crafting thoughtful software with precision.
-                                Based in Vietnam 🇻🇳
+                                Transmuting ideas into Rust APIs & ZK sorcery.
+                                Based in Hanoi, Vietnam 🇻🇳
                             </p>
                         </div>
 

@@ -27,8 +27,8 @@ const Home: NextPage<HomeProps> = ({ allPostsData, spotlights }) => {
     return (
         <>
             <Head>
-                <title>tranduy1dol - Digital Craftsman</title>
-                <meta name="description" content="Building thoughtful software with precision and care. Exploring Rust, Next.js, and the art of clean code." />
+                <title>tranduy1dol - Code Alchemist</title>
+                <meta name="description" content="Transmuting ideas into high-performance Rust APIs, distributed systems, and Zero-Knowledge solutions." />
             </Head>
 
             <div className="max-w-7xl mx-auto px-6">
@@ -38,7 +38,7 @@ const Home: NextPage<HomeProps> = ({ allPostsData, spotlights }) => {
                         className="text-5xl md:text-7xl lg:text-8xl mb-6"
                         style={{ fontFamily: 'var(--font-serif)' }}
                     >
-                        Digital Craftsman.
+                        Code Alchemist.
                     </h1>
                     <p
                         className="text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed"
@@ -48,8 +48,8 @@ const Home: NextPage<HomeProps> = ({ allPostsData, spotlights }) => {
                         }}
                     >
                         Hello, I&apos;m <strong style={{ color: 'rgb(var(--color-text))' }}>tranduy1dol</strong> —
-                        a developer who believes in building thoughtful software with precision and care.
-                        Exploring Rust, Next.js, and the art of clean code.
+                        transmuting ideas into high-performance Rust APIs,
+                        distributed systems, and Zero-Knowledge sorcery.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <Link

@@ -1,14 +1,19 @@
-import { SiRust, SiNextdotjs, SiTypescript, SiTailwindcss, SiReact, SiNodedotjs, SiDocker, SiPostgresql } from 'react-icons/si';
+import {
+    SiRust, SiGo, SiTypescript, SiPostgresql, SiRedis,
+    SiApachekafka, SiDocker, SiKubernetes, SiMongodb, SiRabbitmq
+} from 'react-icons/si';
 
 const technologies = [
     { icon: SiRust, name: 'Rust', color: '#DEA584' },
-    { icon: SiNextdotjs, name: 'Next.js', color: '#000000' },
+    { icon: SiGo, name: 'Golang', color: '#00ADD8' },
     { icon: SiTypescript, name: 'TypeScript', color: '#3178C6' },
-    { icon: SiTailwindcss, name: 'Tailwind', color: '#06B6D4' },
-    { icon: SiReact, name: 'React', color: '#61DAFB' },
-    { icon: SiNodedotjs, name: 'Node.js', color: '#339933' },
-    { icon: SiDocker, name: 'Docker', color: '#2496ED' },
     { icon: SiPostgresql, name: 'PostgreSQL', color: '#4169E1' },
+    { icon: SiMongodb, name: 'MongoDB', color: '#47A248' },
+    { icon: SiRedis, name: 'Redis', color: '#DC382D' },
+    { icon: SiApachekafka, name: 'Kafka', color: '#231F20' },
+    { icon: SiRabbitmq, name: 'RabbitMQ', color: '#FF6600' },
+    { icon: SiDocker, name: 'Docker', color: '#2496ED' },
+    { icon: SiKubernetes, name: 'Kubernetes', color: '#326CE5' },
 ];
 
 export function TechStack() {

@@ -3,7 +3,7 @@ import type { GetStaticProps, GetStaticPaths, NextPage } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
 import { FiArrowLeft } from 'react-icons/fi';
-import Layout from '@/components/Layout';
+
 import { getAllPostIds, getPostData, PostData } from '@/lib/posts';
 
 type PostProps = {
@@ -16,7 +16,7 @@ const Post: NextPage<PostProps> = ({ postData }) => {
     const [copied, setCopied] = useState(false);
     const [comments, setComments] = useState<string[]>([]);
     const [commentText, setCommentText] = useState('');
-    const [showComments, setShowComments] = useState(false);
+
 
     // Load state from localStorage on mount
     useEffect(() => {
@@ -52,7 +52,6 @@ const Post: NextPage<PostProps> = ({ postData }) => {
         const commentSection = document.getElementById('comments-section');
         if (commentSection) {
             commentSection.scrollIntoView({ behavior: 'smooth' });
-            setShowComments(true);
         }
     };
 
