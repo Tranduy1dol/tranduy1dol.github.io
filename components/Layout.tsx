@@ -4,6 +4,8 @@ import { useRouter } from 'next/router';
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
 import { Typewriter } from './Typewriter';
+import { LanguageSwitcher } from './LanguageSwitcher';
+import { useLanguage } from '@/lib/language';
 import { LuCake } from 'react-icons/lu';
 
 type LayoutProps = {
@@ -20,11 +22,13 @@ const Layout = ({ children }: LayoutProps) => {
         setMounted(true);
     }, []);
 
+    const { t } = useLanguage();
+
     const navItems = [
-        { href: '/', label: 'Home' },
-        { href: '/about', label: 'About' },
-        { href: '/blog', label: 'Blog' },
-        { href: '/book', label: 'Book' },
+        { href: '/', labelKey: 'nav.home' },
+        { href: '/about', labelKey: 'nav.about' },
+        { href: '/blog', labelKey: 'nav.blog' },
+        { href: '/book', labelKey: 'nav.book' },
     ];
 
     const isActive = (path: string) => {
@@ -88,6 +92,7 @@ const Layout = ({ children }: LayoutProps) => {
                                     )}
                                 </button>
                             )}
+                            <LanguageSwitcher />
                         </div>
                     </div>
                     <nav className="flex gap-8">
@@ -98,7 +103,7 @@ const Layout = ({ children }: LayoutProps) => {
                                     className={`no-underline hover:opacity-60 transition-opacity ${isActive(item.href) ? 'opacity-100' : 'opacity-70'
                                         }`}
                                 >
-                                    {item.label}
+                                    {t(item.labelKey)}
                                 </Link>
                             </h4>
                         ))}
@@ -125,7 +130,7 @@ const Layout = ({ children }: LayoutProps) => {
 
                         {/* Navigate Section */}
                         <div>
-                            <h4 className="mb-4">Navigate</h4>
+                            <h4 className="mb-4">{t('footer.navigate')}</h4>
                             <ul className="space-y-2 text-sm">
                                 {navItems.map((item) => (
                                     <li key={item.href}>
@@ -134,7 +139,7 @@ const Layout = ({ children }: LayoutProps) => {
                                             className="hover:opacity-70 transition-opacity"
                                             style={{ color: 'rgb(var(--color-text-muted))' }}
                                         >
-                                            {item.label}
+                                            {t(item.labelKey)}
                                         </Link>
                                     </li>
                                 ))}
@@ -143,7 +148,7 @@ const Layout = ({ children }: LayoutProps) => {
 
                         {/* Connect Section */}
                         <div>
-                            <h4 className="mb-4">Connect</h4>
+                            <h4 className="mb-4">{t('footer.connect')}</h4>
                             <ul className="space-y-2 text-sm">
                                 <li>
                                     <a
