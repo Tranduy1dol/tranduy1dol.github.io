@@ -3,27 +3,39 @@
 /* Google Fonts - Playfair Display */
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
 
-/* Design System Variables */
+/* Design System Variables - Light Theme: "Old Newspaper" */
 :root {
-  --color-bg: 250 248 245;
-  --color-surface: 245 242 238;
-  --color-border: 60 56 54;
-  --color-text: 28 25 23;
-  --color-text-muted: 87 83 78;
-  --color-accent: 68 64 60;
+  /* Background: Warm, slightly yellowed aged paper - #EFEEE8 */
+  --color-bg: 239 238 232;
+  /* Surface: Slightly darker paper for cards/sections - #E8E6DF */
+  --color-surface: 232 230 223;
+  /* Border: Warm stone grey - #A8A29E */
+  --color-border: 168 162 158;
+  /* Text: Soft charcoal faded ink - #2B2B2B */
+  --color-text: 43 43 43;
+  /* Text Muted: Aged grey ink - #6B6560 */
+  --color-text-muted: 107 101 96;
+  /* Accent: Warm sepia tone - #8B7355 */
+  --color-accent: 139 115 85;
 
   --font-serif: 'Playfair Display', Georgia, 'Times New Roman', serif;
   --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-/* Dark theme variables */
+/* Dark Theme: "Dark Roast Coffee" */
 .dark {
-  --color-bg: 28 25 23;
-  --color-surface: 41 37 36;
-  --color-border: 168 162 158;
-  --color-text: 245 245 244;
-  --color-text-muted: 168 162 158;
-  --color-accent: 214 211 209;
+  /* Background: Deep espresso brown - #241E19 */
+  --color-bg: 36 30 25;
+  /* Surface: Medium roast for cards - #2F2722 */
+  --color-surface: 47 39 34;
+  /* Border: Medium roast brown - #4A3B32 */
+  --color-border: 74 59 50;
+  /* Text: Oat milk/latte foam - #EBE0D0 */
+  --color-text: 235 224 208;
+  /* Text Muted: Steamed milk - #B8A898 */
+  --color-text-muted: 184 168 152;
+  /* Accent: Caramel highlight - #C4956A */
+  --color-accent: 196 149 106;
 }
 
 /* Base Styles */

@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
 import { Typewriter } from './Typewriter';
+import { LuCake } from 'react-icons/lu';
 
 type LayoutProps = {
     children: React.ReactNode;
@@ -31,11 +32,15 @@ const Layout = ({ children }: LayoutProps) => {
         return router.pathname.startsWith(path);
     };
 
-    const currentDate = new Date().toLocaleDateString('en-US', {
+    const now = new Date();
+    const currentDate = now.toLocaleDateString('en-US', {
         month: 'short',
         day: 'numeric',
         year: 'numeric',
     }).toUpperCase();
+
+    // Check if today is birthday (December 27th)
+    const isBirthday = now.getMonth() === 11 && now.getDate() === 27;
 
     return (
         <div className="min-h-screen" style={{ backgroundColor: 'rgb(var(--color-bg))', color: 'rgb(var(--color-text))' }}>
@@ -49,7 +54,13 @@ const Layout = ({ children }: LayoutProps) => {
                             </Link>
                         </h1>
                         <div className="flex items-center gap-4">
-                            <time className="text-sm" style={{ color: 'rgb(var(--color-text-muted))' }}>
+                            <time className="text-sm inline-flex items-center gap-2" style={{ color: 'rgb(var(--color-text-muted))' }}>
+                                {isBirthday && (
+                                    <LuCake
+                                        className="w-5 h-5"
+                                        title="It's my birthday!"
+                                    />
+                                )}
                                 {currentDate}
                             </time>
                             {mounted && (

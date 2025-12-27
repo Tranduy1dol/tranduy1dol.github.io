@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { getSortedPostsData, PostData } from '@/lib/posts';
 import { getSpotlightProjects, SpotlightData } from '@/lib/spotlight';
 import { TechStack } from '@/components/TechStack';
-import { FiArrowRight, FiBookOpen, FiExternalLink } from 'react-icons/fi';
+import { FiArrowRight, FiBookOpen, FiExternalLink, FiDownload } from 'react-icons/fi';
 
 type HomeProps = {
     allPostsData: PostData[];
@@ -63,6 +63,16 @@ const Home: NextPage<HomeProps> = ({ allPostsData, spotlights }) => {
                             <FiBookOpen className="w-4 h-4" />
                             Read Blog
                         </Link>
+                        <a
+                            href="/Tran_Manh_Duy-Blockchain_Backedn_Developer.pdf"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center justify-center gap-2 px-8 py-3 border-2 text-sm uppercase tracking-wider no-underline transition-all hover:opacity-70"
+                            style={{ borderColor: 'rgb(var(--color-border))' }}
+                        >
+                            <FiDownload className="w-4 h-4" />
+                            View CV
+                        </a>
                         <Link
                             href="/about"
                             className="inline-flex items-center justify-center gap-2 px-8 py-3 border-2 text-sm uppercase tracking-wider no-underline transition-all hover:opacity-70"
