@@ -4,7 +4,11 @@ type TimelineItem = {
     description: string;
 };
 
-const milestones: TimelineItem[] = [
+interface TimelineProps {
+    milestones?: TimelineItem[];
+}
+
+const defaultMilestones: TimelineItem[] = [
     {
         year: '2025',
         title: 'Rebranding & New Chapter',
@@ -27,7 +31,7 @@ const milestones: TimelineItem[] = [
     },
 ];
 
-export function Timeline() {
+export function Timeline({ milestones = defaultMilestones }: TimelineProps) {
     return (
         <div className="relative">
             {/* Vertical line */}
@@ -72,3 +76,5 @@ export function Timeline() {
         </div>
     );
 }
+
+export type { TimelineItem };

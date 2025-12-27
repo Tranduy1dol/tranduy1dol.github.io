@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
+import { Typewriter } from './Typewriter';
 
 type LayoutProps = {
     children: React.ReactNode;
@@ -44,7 +45,7 @@ const Layout = ({ children }: LayoutProps) => {
                     <div className="flex items-baseline justify-between mb-6">
                         <h1 className="text-5xl md:text-6xl">
                             <Link href="/" className="no-underline hover:opacity-70 transition-opacity">
-                                tranduy1dol
+                                {mounted ? <Typewriter texts={["Hi, I'm Tranduy1dol", "Welcome to my blog"]} speed={80} /> : "Hi, I'm Tranduy1dol"}
                             </Link>
                         </h1>
                         <div className="flex items-center gap-4">
@@ -107,7 +108,7 @@ const Layout = ({ children }: LayoutProps) => {
                         <div>
                             <h3 className="mb-4">tranduy1dol</h3>
                             <p className="text-sm leading-relaxed" style={{ color: 'rgb(var(--color-text-muted))' }}>
-                                A personal space for thoughts on technology, software development, and the craft of building things that matter.
+                                Crafting thoughtful software with precision. Based in Vietnam 🇻🇳
                             </p>
                         </div>
 
