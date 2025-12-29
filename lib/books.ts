@@ -43,16 +43,20 @@ export function getSortedBooksData(): BookData[] {
         const fileContents = fs.readFileSync(fullPath, 'utf8');
         const matterResult = matter(fileContents);
 
+        // Convert Date objects to ISO strings for serialization
+        const dateRead = matterResult.data.dateRead;
+        const dateReadStr = dateRead instanceof Date
+            ? dateRead.toISOString().split('T')[0]
+            : dateRead;
+
         return {
             id,
-            ...(matterResult.data as {
-                title: string;
-                author: string;
-                cover: string;
-                rating?: number;
-                dateRead?: string;
-                status?: 'reading' | 'completed' | 'want-to-read';
-            }),
+            title: matterResult.data.title as string,
+            author: matterResult.data.author as string,
+            cover: matterResult.data.cover as string,
+            rating: matterResult.data.rating as number | undefined,
+            dateRead: dateReadStr as string | undefined,
+            status: matterResult.data.status as 'reading' | 'completed' | 'want-to-read' | undefined,
         };
     });
 
@@ -102,16 +106,20 @@ export async function getBookData(id: string): Promise<BookData> {
 
     const contentHtml = contentWithIds.toString();
 
+    // Convert Date objects to ISO strings for serialization
+    const dateRead = matterResult.data.dateRead;
+    const dateReadStr = dateRead instanceof Date
+        ? dateRead.toISOString().split('T')[0]
+        : dateRead;
+
     return {
         id,
         contentHtml,
-        ...(matterResult.data as {
-            title: string;
-            author: string;
-            cover: string;
-            rating?: number;
-            dateRead?: string;
-            status?: 'reading' | 'completed' | 'want-to-read';
-        }),
+        title: matterResult.data.title as string,
+        author: matterResult.data.author as string,
+        cover: matterResult.data.cover as string,
+        rating: matterResult.data.rating as number | undefined,
+        dateRead: dateReadStr as string | undefined,
+        status: matterResult.data.status as 'reading' | 'completed' | 'want-to-read' | undefined,
     };
 }

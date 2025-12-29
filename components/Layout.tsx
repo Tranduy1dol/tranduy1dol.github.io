@@ -4,8 +4,6 @@ import { useRouter } from 'next/router';
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
 import { Typewriter } from './Typewriter';
-import { LanguageSwitcher } from './LanguageSwitcher';
-import { useLanguage } from '@/lib/language';
 import { LuCake } from 'react-icons/lu';
 
 type LayoutProps = {
@@ -22,13 +20,11 @@ const Layout = ({ children }: LayoutProps) => {
         setMounted(true);
     }, []);
 
-    const { t } = useLanguage();
-
     const navItems = [
-        { href: '/', labelKey: 'nav.home' },
-        { href: '/about', labelKey: 'nav.about' },
-        { href: '/blog', labelKey: 'nav.blog' },
-        { href: '/book', labelKey: 'nav.book' },
+        { href: '/', label: 'Home' },
+        { href: '/about', label: 'About' },
+        { href: '/blog', label: 'Blog' },
+        { href: '/book', label: 'Book' },
     ];
 
     const isActive = (path: string) => {
@@ -54,7 +50,7 @@ const Layout = ({ children }: LayoutProps) => {
                     <div className="flex items-baseline justify-between mb-6">
                         <h1 className="text-5xl md:text-6xl">
                             <Link href="/" className="no-underline hover:opacity-70 transition-opacity">
-                                {mounted ? <Typewriter texts={["Hi, I'm Tranduy1dol", "Welcome to my blog"]} speed={80} /> : "Hi, I'm Tranduy1dol"}
+                                {mounted ? <Typewriter texts={["Hi, I'm tranduy1dol", "Welcome to my blog"]} speed={80} /> : "Hi, I'm tranduy1dol"}
                             </Link>
                         </h1>
                         <div className="flex items-center gap-4">
@@ -92,7 +88,6 @@ const Layout = ({ children }: LayoutProps) => {
                                     )}
                                 </button>
                             )}
-                            <LanguageSwitcher />
                         </div>
                     </div>
                     <nav className="flex gap-8">
@@ -103,7 +98,7 @@ const Layout = ({ children }: LayoutProps) => {
                                     className={`no-underline hover:opacity-60 transition-opacity ${isActive(item.href) ? 'opacity-100' : 'opacity-70'
                                         }`}
                                 >
-                                    {t(item.labelKey)}
+                                    {item.label}
                                 </Link>
                             </h4>
                         ))}
@@ -130,7 +125,7 @@ const Layout = ({ children }: LayoutProps) => {
 
                         {/* Navigate Section */}
                         <div>
-                            <h4 className="mb-4">{t('footer.navigate')}</h4>
+                            <h4 className="mb-4">Navigate</h4>
                             <ul className="space-y-2 text-sm">
                                 {navItems.map((item) => (
                                     <li key={item.href}>
@@ -139,7 +134,7 @@ const Layout = ({ children }: LayoutProps) => {
                                             className="hover:opacity-70 transition-opacity"
                                             style={{ color: 'rgb(var(--color-text-muted))' }}
                                         >
-                                            {t(item.labelKey)}
+                                            {item.label}
                                         </Link>
                                     </li>
                                 ))}
@@ -148,7 +143,7 @@ const Layout = ({ children }: LayoutProps) => {
 
                         {/* Connect Section */}
                         <div>
-                            <h4 className="mb-4">{t('footer.connect')}</h4>
+                            <h4 className="mb-4">Connect</h4>
                             <ul className="space-y-2 text-sm">
                                 <li>
                                     <a
