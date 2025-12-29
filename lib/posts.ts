@@ -107,17 +107,21 @@ export function getSortedPostsData(): PostData[] {
             tags.push(...frontmatterTags);
         }
 
+        // Convert Date objects to ISO strings for serialization
+        const dateValue = matterResult.data.date;
+        const dateStr = dateValue instanceof Date
+            ? dateValue.toISOString().split('T')[0]
+            : dateValue;
+
         // Combine the data with the id
         return {
             id,
             readTime,
             tags,
-            ...(matterResult.data as {
-                date: string;
-                title: string;
-                excerpt?: string;
-                category?: string;
-            }),
+            date: dateStr as string,
+            title: matterResult.data.title as string,
+            excerpt: matterResult.data.excerpt as string | undefined,
+            category: matterResult.data.category as string | undefined,
         };
     });
 
@@ -217,6 +221,12 @@ export async function getPostData(id: string): Promise<PostData> {
         tags.push(...frontmatterTags);
     }
 
+    // Convert Date objects to ISO strings for serialization
+    const dateValue = matterResult.data.date;
+    const dateStr = dateValue instanceof Date
+        ? dateValue.toISOString().split('T')[0]
+        : dateValue;
+
     // Combine the data with the id and contentHtml
     return {
         id,
@@ -224,11 +234,9 @@ export async function getPostData(id: string): Promise<PostData> {
         readTime,
         headings,
         tags,
-        ...(matterResult.data as {
-            date: string;
-            title: string;
-            excerpt?: string;
-            category?: string;
-        }),
+        date: dateStr as string,
+        title: matterResult.data.title as string,
+        excerpt: matterResult.data.excerpt as string | undefined,
+        category: matterResult.data.category as string | undefined,
     };
 }
