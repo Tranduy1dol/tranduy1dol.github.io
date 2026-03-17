@@ -1,10 +1,13 @@
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
-import { remark } from 'remark';
-import html from 'remark-html';
-import { rehype } from 'rehype';
+import { unified } from 'unified';
+import remarkParse from 'remark-parse';
+import remarkMath from 'remark-math';
+import remarkRehype from 'remark-rehype';
+import rehypeKatex from 'rehype-katex';
 import rehypeSlug from 'rehype-slug';
+import rehypeStringify from 'rehype-stringify';
 
 const postsDirectory = path.join(process.cwd(), '_posts');
 
@@ -196,17 +199,17 @@ export async function getPostData(id: string): Promise<PostData> {
     // Extract headings from markdown before processing
     const headings = extractHeadings(matterResult.content);
 
-    // Use remark to convert markdown into HTML string
-    const processedContent = await remark()
-        .use(html)
+    // Use unified pipeline to convert markdown into HTML with math support
+    const processedContent = await unified()
+        .use(remarkParse)
+        .use(remarkMath)
+        .use(remarkRehype)
+        .use(rehypeKatex)
+        .use(rehypeSlug)
+        .use(rehypeStringify)
         .process(matterResult.content);
 
-    // Add IDs to headings using rehype-slug
-    const contentWithIds = await rehype()
-        .use(rehypeSlug)
-        .process(processedContent.toString());
-
-    const contentHtml = contentWithIds.toString();
+    const contentHtml = processedContent.toString();
 
     // Calculate read time if not provided
     const readTime = matterResult.data.readTime || calculateReadTime(matterResult.content);

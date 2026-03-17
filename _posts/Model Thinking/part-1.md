@@ -17,15 +17,19 @@ Bất kỳ mô hình nào cũng phải cắt bỏ đi những chi tiết phức 
 Có 4 lý do chính mình được học:
 
 1. Mô hình giúp chúng ta trở thành công dân thông minh
+
 Lý do đơn giản là mô hình tốt hơn. Việc sử dụng mô hình giúp suy nghĩ của chúng ta trở lên logic. Khi đối mặt với một vấn đề, vô vàn ý tưởng sẽ chạy lung tung trong đầu. Một mô hình tốt sẽ đóng vai trò như chiếc xương sống, giúp ta phân loại và sắp xếp những luồng suy nghĩ đó một cách rành mạch. Nhưng khi có mô hình làm xương sống, việc sắp xếp suy nghĩ trở nên đơn giản hơn. Ngoài ra, mô hình cũng làm chúng ta khiếm tốn hơn.
 
 2. Mô hình giúp chúng ta suy nghĩ rõ ràng
+
 Giống như đã nói, có xương sống thì suy nghĩ được sắp xếp. Không chỉ thế, khi sử dụng mô hình, chúng ta sẽ cần suy nghĩ đến các thành phần của mô hình đó. Việc này giúp ta xác định được quan hệ và ranh giới logic giữa chúng.
 
 3. Mô hình giúp ta hiểu dữ liệu
+
 Hiểu ở đây không chỉ nói đến việc dự đoán 1 cách gần như chính xác, mà còn giúp giải thích các hiện tượng, hiểu độ tốt của các mô hình, và lấy những tri thức từ việc nhìn và đọc dữ liệu.
 
 4. Mô hình giúp ta đưa ra quyết định, thiết kế, chính sách tốt hơn
+
 Từ việc hiểu dữ liệu, chúng ta có thể tự đánh giá các quyết định. Từ đó, ta có cơ sở khách quan để cân nhắc và so sánh xem lựa chọn nào mang lại lợi ích tối ưu nhất.
 
 ## Các mô hình Phân loại (Categorical Models)
@@ -45,6 +49,6 @@ Mô hình tuyến tính nâng cao hơn một bước so với mô hình phân lo
 1. **Dấu (Sign):** Xác định biến $x$ có tác động tích cực (+) hay tiêu cực (-) lên biến y.
 2. **Độ lớn (Magnitude):** Xác định sự thay đổi của $y$ là bao nhiêu khi $x$ tăng lên 1 đơn vị.
 
-Trong thực tế, một kết quả $(y)$ thường bị ảnh hưởng bởi nhiều nguyên nhân $(x_1​,x_2​,…)$, tạo thành mô hình tuyến tính đa biến: $y=\beta_0​+\beta_1​ x_1​+\beta_2​ x_2 + \ldots​$. Việc chạy mô hình tuyến tính giúp chúng ta xác định được **Hệ số lớn (Big Coefficient)**. Ví dụ, trong giáo dục, $y$ là điểm số, $x_1$​ là sĩ số lớp và $x_2$​ là chất lượng giáo viên. Dữ liệu hồi quy có thể cho thấy hệ số của "chất lượng giáo viên" lớn hơn rất nhiều so với "sĩ số lớp". Dựa vào tư duy hệ số lớn, các nhà hoạch định chính sách hoặc doanh nghiệp biết chính xác nên dồn nguồn lực (đầu tư tiền bạc, thời gian) vào đâu để thu được kết quả tốt nhất ("bang for the buck").
+Trong thực tế, một kết quả $(y)$ thường bị ảnh hưởng bởi nhiều nguyên nhân $(x_1,x_2,…)$, tạo thành mô hình tuyến tính đa biến: $y=\beta_0+\beta_1 x_1+\beta_2 x_2 + \ldots$. Việc chạy mô hình tuyến tính giúp chúng ta xác định được **Hệ số lớn (Big Coefficient)**. Ví dụ, trong giáo dục, $y$ là điểm số, $x_1$ là sĩ số lớp và $x_2$ là chất lượng giáo viên. Dữ liệu hồi quy có thể cho thấy hệ số của "chất lượng giáo viên" lớn hơn rất nhiều so với "sĩ số lớp". Dựa vào tư duy hệ số lớn, các nhà hoạch định chính sách hoặc doanh nghiệp biết chính xác nên dồn nguồn lực (đầu tư tiền bạc, thời gian) vào đâu để thu được kết quả tốt nhất ("bang for the buck").
 
 Một lý do khiến mô hình tuyến tính hữu ích một cách đáng kinh ngạc trong một thế giới phi tuyến tính là vì "mọi thứ đều tuyến tính, ít nhất là trong một khoảng thời gian ngắn". Bất kỳ một đường cong phức tạp nào cũng có thể được xấp xỉ bằng một loạt các đoạn thẳng ngắn, giống như một bức tường gạch uốn lượn thực chất được xếp từ những viên gạch thẳng. Tuy nhiên, hạn chế lớn của việc dựa vào "Hệ số lớn" trong mô hình tuyến tính là nó chỉ chính xác trong phạm vi dữ liệu hiện có. Nếu muốn vượt ra ngoài, tạo ra những đổi mới đột phá hoặc những "thực tại mới" (new realities), chúng ta không thể chỉ ngoại suy tuyến tính một cách mù quáng, mà cần suy nghĩ vượt ra ngoài khuôn khổ dữ liệu bằng các mô hình phức tạp hơn.
