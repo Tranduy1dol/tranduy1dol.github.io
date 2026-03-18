@@ -8,6 +8,7 @@ import remarkRehype from 'remark-rehype';
 import rehypeKatex from 'rehype-katex';
 import rehypeSlug from 'rehype-slug';
 import rehypeStringify from 'rehype-stringify';
+import GithubSlugger from 'github-slugger';
 
 const postsDirectory = path.join(process.cwd(), '_posts');
 
@@ -46,15 +47,13 @@ function calculateReadTime(content: string): string {
 function extractHeadings(content: string): Heading[] {
     const headingRegex = /^(#{1,6})\s+(.+)$/gm;
     const headings: Heading[] = [];
+    const slugger = new GithubSlugger();
     let match;
 
     while ((match = headingRegex.exec(content)) !== null) {
         const level = match[1].length;
         const text = match[2].trim();
-        const slug = text
-            .toLowerCase()
-            .replace(/[^\w\s-]/g, '')
-            .replace(/\s+/g, '-');
+        const slug = slugger.slug(text);
 
         headings.push({ text, slug, level });
     }
