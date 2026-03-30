@@ -4,7 +4,7 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { FiArrowLeft } from 'react-icons/fi';
 
-import { getAllPostIds, getPostData, PostData } from '@/lib/posts';
+import { getAllPostSlugs, getPostData, PostData } from '@/lib/posts';
 
 type PostProps = {
     postData: PostData;
@@ -332,7 +332,7 @@ const Post: NextPage<PostProps> = ({ postData }) => {
 export default Post;
 
 export const getStaticPaths: GetStaticPaths = async () => {
-    const paths = getAllPostIds();
+    const paths = getAllPostSlugs();
     return {
         paths,
         fallback: false,
@@ -340,7 +340,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 };
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
-    const postData = await getPostData(params?.id as string);
+    const postData = await getPostData(params?.slug as string[]);
     return {
         props: {
             postData,

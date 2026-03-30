@@ -20,6 +20,7 @@ export type Heading = {
 
 export type PostData = {
     id: string;
+    slug: string[];
     date: string;
     title: string;
     excerpt?: string;
@@ -34,6 +35,24 @@ export type TagCount = {
     name: string;
     count: number;
 };
+
+// Convert a string to a URL-friendly slug
+function slugify(text: string): string {
+    return text
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+}
+
+// Build the slug array from the file path relative to _posts
+function buildSlug(filePath: string): string[] {
+    const relativePath = path.relative(postsDirectory, filePath);
+    const parts = relativePath.split(path.sep);
+    // Last part is the filename, rest are folder names
+    const folderParts = parts.slice(0, -1).map(slugify);
+    const fileName = parts[parts.length - 1].replace(/\.md$/, '');
+    return [...folderParts, slugify(fileName)];
+}
 
 // Calculate estimated reading time
 function calculateReadTime(content: string): string {
@@ -90,6 +109,9 @@ export function getSortedPostsData(): PostData[] {
         const fileName = path.basename(filePath);
         const id = fileName.replace(/\.md$/, '');
 
+        // Build slug from file path
+        const slug = buildSlug(filePath);
+
         // Read markdown file as string
         const fileContents = fs.readFileSync(filePath, 'utf8');
 
@@ -118,6 +140,7 @@ export function getSortedPostsData(): PostData[] {
         // Combine the data with the id
         return {
             id,
+            slug,
             readTime,
             tags,
             date: dateStr as string,
@@ -155,37 +178,41 @@ export function getAllTags(): TagCount[] {
         .sort((a, b) => b.count - a.count);
 }
 
-// Gets all possible slugs/IDs for dynamic routing
-export function getAllPostIds() {
+// Gets all possible slugs for dynamic routing (catch-all [...slug])
+export function getAllPostSlugs() {
     const allFiles = getAllMarkdownFiles(postsDirectory);
     return allFiles.map(({ filePath }) => {
-        const fileName = path.basename(filePath);
+        const slug = buildSlug(filePath);
         return {
             params: {
-                id: fileName.replace(/\.md$/, ''),
+                slug,
             },
         };
     });
 }
 
-// Find a post file by id (searches recursively)
-function findPostFile(id: string): string | null {
+// Find a post file by slug array (searches recursively)
+function findPostFileBySlug(slug: string[]): string | null {
     const allFiles = getAllMarkdownFiles(postsDirectory);
     const found = allFiles.find(({ filePath }) => {
-        const fileName = path.basename(filePath);
-        return fileName.replace(/\.md$/, '') === id;
+        const fileSlug = buildSlug(filePath);
+        return fileSlug.length === slug.length && fileSlug.every((s, i) => s === slug[i]);
     });
     return found ? found.filePath : null;
 }
 
 // Gets the full data for a single post, including HTML content
-export async function getPostData(id: string): Promise<PostData> {
-    const filePath = findPostFile(id);
+export async function getPostData(slug: string[]): Promise<PostData> {
+    const filePath = findPostFileBySlug(slug);
     if (!filePath) {
-        throw new Error(`Post not found: ${id}`);
+        throw new Error(`Post not found: ${slug.join('/')}`);
     }
 
     const fileContents = fs.readFileSync(filePath, 'utf8');
+
+    // Get id from filename
+    const fileName = path.basename(filePath);
+    const id = fileName.replace(/\.md$/, '');
 
     // Get tag from folder if in subdirectory
     const relativePath = path.relative(postsDirectory, filePath);
@@ -232,6 +259,7 @@ export async function getPostData(id: string): Promise<PostData> {
     // Combine the data with the id and contentHtml
     return {
         id,
+        slug,
         contentHtml,
         readTime,
         headings,

@@ -209,7 +209,7 @@ const Home: NextPage<HomeProps> = ({ allPostsData, spotlights }) => {
                         {recentPosts.map((post) => (
                             <Link
                                 key={post.id}
-                                href={`/posts/${post.id}`}
+                                href={`/blog/${post.slug.join('/')}`}
                                 className="no-underline block group"
                             >
                                 <article

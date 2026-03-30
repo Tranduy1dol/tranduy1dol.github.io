@@ -120,7 +120,7 @@ const Blog: NextPage<BlogProps> = ({ allPostsData, allTags }) => {
                             filteredPosts.map((post) => (
                                 <Link
                                     key={post.id}
-                                    href={`/posts/${post.id}`}
+                                    href={`/blog/${post.slug.join('/')}`}
                                     className="no-underline block group"
                                 >
                                     <article
