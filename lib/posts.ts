@@ -10,6 +10,7 @@ import rehypeSlug from 'rehype-slug';
 import rehypeStringify from 'rehype-stringify';
 import GithubSlugger from 'github-slugger';
 
+
 const postsDirectory = path.join(process.cwd(), '_posts');
 
 export type Heading = {
@@ -225,6 +226,9 @@ export async function getPostData(slug: string[]): Promise<PostData> {
     // Extract headings from markdown before processing
     const headings = extractHeadings(matterResult.content);
 
+    // Replace `public/` prefix in markdown image links so they work in both Obsidian (which needs public/) and Next.js (which serves from /)
+    const contentWithFixedImages = matterResult.content.replace(/!\[([^\]]*)\]\(public\/(.*?)\)/g, '![$1](/$2)');
+
     // Use unified pipeline to convert markdown into HTML with math support
     const processedContent = await unified()
         .use(remarkParse)
@@ -233,7 +237,7 @@ export async function getPostData(slug: string[]): Promise<PostData> {
         .use(rehypeKatex)
         .use(rehypeSlug)
         .use(rehypeStringify)
-        .process(matterResult.content);
+        .process(contentWithFixedImages);
 
     const contentHtml = processedContent.toString();
 
