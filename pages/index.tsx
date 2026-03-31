@@ -64,7 +64,7 @@ const Home: NextPage<HomeProps> = ({ allPostsData, spotlights }) => {
                             Read Blog
                         </Link>
                         <a
-                            href="/Tran_Manh_Duy-Blockchain_Backedn_Developer.pdf"
+                            href="/cv.pdf"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex items-center justify-center gap-2 px-8 py-3 border-2 text-sm uppercase tracking-wider no-underline transition-all hover:opacity-70"
