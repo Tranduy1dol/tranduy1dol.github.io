@@ -240,8 +240,27 @@ ol {
 }
 
 .prose img {
-  margin: 2rem 0;
+  margin: 2rem auto;
   border: 2px solid rgb(var(--color-border));
+}
+
+.prose table {
+  width: max-content;
+  max-width: 100%;
+  margin: 2rem auto;
+  border-collapse: collapse;
+}
+
+.prose th,
+.prose td {
+  border: 1px solid rgb(var(--color-border));
+  padding: 0.75rem 1rem;
+}
+
+.prose th {
+  background-color: rgb(var(--color-surface));
+  font-weight: 600;
+  text-align: left;
 }
 
 /* Utility classes */

@@ -4,6 +4,7 @@ import matter from 'gray-matter';
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import remarkMath from 'remark-math';
+import remarkGfm from 'remark-gfm';
 import remarkRehype from 'remark-rehype';
 import rehypeKatex from 'rehype-katex';
 import rehypeSlug from 'rehype-slug';
@@ -232,6 +233,7 @@ export async function getPostData(slug: string[]): Promise<PostData> {
     // Use unified pipeline to convert markdown into HTML with math support
     const processedContent = await unified()
         .use(remarkParse)
+        .use(remarkGfm)
         .use(remarkMath)
         .use(remarkRehype)
         .use(rehypeKatex)
