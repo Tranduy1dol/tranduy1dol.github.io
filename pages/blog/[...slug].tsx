@@ -17,19 +17,24 @@ type PostProps = {
 
 const Post: NextPage<PostProps> = ({ postData }) => {
     const [reactionCount, setReactionCount] = useState(0);
+    const [commentCount, setCommentCount] = useState(0);
     const [copied, setCopied] = useState(false);
 
-    // Listen for Giscus metadata to get real reaction counts from GitHub Discussions
+    // Listen for Giscus metadata to get reaction + comment counts
     useEffect(() => {
         const handleMessage = (event: MessageEvent) => {
             if (event.origin !== 'https://giscus.app') return;
-            if (!event.data || !event.data.giscus) return;
+            if (!event.data?.giscus) return;
 
             const giscusData = event.data.giscus;
-
-            // discussion metadata contains reaction count
             if (giscusData.discussion) {
-                setReactionCount(giscusData.discussion.totalReactionCount ?? 0);
+                // Reaction count (the emoji reactions on the Discussion itself)
+                setReactionCount(giscusData.discussion.reactionCount ?? 0);
+
+                // Comment count
+                const total = (giscusData.discussion.totalCommentCount ?? 0) +
+                    (giscusData.discussion.totalReplyCount ?? 0);
+                setCommentCount(total);
             }
         };
 
@@ -98,7 +103,7 @@ const Post: NextPage<PostProps> = ({ postData }) => {
                             <button
                                 onClick={scrollToReactions}
                                 className="flex flex-col items-center gap-2 group transition-transform active:scale-95"
-                                title="React on this post"
+                                title="React to this post"
                             >
                                 <svg
                                     className={`w-6 h-6 transition-all ${reactionCount > 0 ? 'fill-red-500 stroke-red-500' : 'group-hover:stroke-red-500'}`}
@@ -113,7 +118,7 @@ const Post: NextPage<PostProps> = ({ postData }) => {
                                 >
                                     <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
                                 </svg>
-                                <span className={`text-xs ${reactionCount > 0 ? 'text-red-500' : ''}`} style={{ color: reactionCount > 0 ? '#ef4444' : 'rgb(var(--color-text-muted))' }}>{reactionCount}</span>
+                                <span className="text-xs" style={{ color: reactionCount > 0 ? '#ef4444' : 'rgb(var(--color-text-muted))' }}>{reactionCount}</span>
                             </button>
 
                             <button
@@ -155,7 +160,7 @@ const Post: NextPage<PostProps> = ({ postData }) => {
                                 >
                                     <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" />
                                 </svg>
-                                <span className="text-xs group-hover:text-blue-500" style={{ color: 'rgb(var(--color-text-muted))' }}>💬</span>
+                                <span className="text-xs group-hover:text-blue-500" style={{ color: 'rgb(var(--color-text-muted))' }}>{commentCount}</span>
                             </button>
                         </div>
                     </aside>

@@ -117,3 +117,18 @@ main .gsc-reply-box {
   border-color: #4A3B32;
   background-color: #241E19;
 }
+
+/* Style Giscus reactions — hide header, show compact reaction buttons */
+main .gsc-reactions-count {
+  display: none !important;
+}
+
+main .gsc-social-reaction-summary-item {
+  justify-content: center !important;
+}
+
+main .gsc-reactions {
+  border-bottom: 1px solid #4A3B32 !important;
+  padding-bottom: 1rem !important;
+  margin-bottom: 0.5rem !important;
+}
