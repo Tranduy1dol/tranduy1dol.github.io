@@ -1,0 +1,119 @@
+/*! Custom Giscus theme — "Dark Roast Coffee" dark theme for tranduy1dol.github.io */
+
+main {
+  --color-prettylights-syntax-comment: #B8A898;
+  --color-prettylights-syntax-constant: #C4956A;
+  --color-prettylights-syntax-entity: #B8A898;
+  --color-prettylights-syntax-storage-modifier-import: #EBE0D0;
+  --color-prettylights-syntax-entity-tag: #C4956A;
+  --color-prettylights-syntax-keyword: #C4956A;
+  --color-prettylights-syntax-string: #B8A898;
+  --color-prettylights-syntax-variable: #C4956A;
+  --color-prettylights-syntax-brackethighlighter-unmatched: #4A3B32;
+  --color-prettylights-syntax-invalid-illegal-text: #241E19;
+  --color-prettylights-syntax-invalid-illegal-bg: #C4956A;
+  --color-prettylights-syntax-carriage-return-text: #241E19;
+  --color-prettylights-syntax-carriage-return-bg: #C4956A;
+  --color-prettylights-syntax-string-regexp: #C4956A;
+  --color-prettylights-syntax-markup-list: #B8A898;
+  --color-prettylights-syntax-markup-heading: #EBE0D0;
+  --color-prettylights-syntax-markup-italic: #EBE0D0;
+  --color-prettylights-syntax-markup-bold: #EBE0D0;
+  --color-prettylights-syntax-markup-deleted-text: #C4956A;
+  --color-prettylights-syntax-markup-deleted-bg: #2F2722;
+  --color-prettylights-syntax-markup-inserted-text: #C4956A;
+  --color-prettylights-syntax-markup-inserted-bg: #2F2722;
+  --color-prettylights-syntax-markup-changed-text: #C4956A;
+  --color-prettylights-syntax-markup-changed-bg: #2F2722;
+  --color-prettylights-syntax-markup-ignored-text: #4A3B32;
+  --color-prettylights-syntax-markup-ignored-bg: #2F2722;
+  --color-prettylights-syntax-meta-diff-range: #C4956A;
+  --color-prettylights-syntax-sublimelinter-gutter-mark: #4A3B32;
+
+  --color-btn-text: #EBE0D0;
+  --color-btn-bg: #2F2722;
+  --color-btn-border: #4A3B32;
+  --color-btn-shadow: 0 0 transparent;
+  --color-btn-inset-shadow: 0 0 transparent;
+  --color-btn-hover-bg: #3a302a;
+  --color-btn-hover-border: #5a4a3e;
+  --color-btn-active-bg: #2F2722;
+  --color-btn-active-border: #4A3B32;
+  --color-btn-selected-bg: #2F2722;
+  --color-btn-primary-text: #241E19;
+  --color-btn-primary-bg: #C4956A;
+  --color-btn-primary-border: #C4956A;
+  --color-btn-primary-shadow: 0 0 transparent;
+  --color-btn-primary-inset-shadow: 0 0 transparent;
+  --color-btn-primary-hover-bg: #d4a57a;
+  --color-btn-primary-hover-border: #d4a57a;
+  --color-btn-primary-selected-bg: #C4956A;
+  --color-btn-primary-disabled-text: rgba(36, 30, 25, 0.5);
+  --color-btn-primary-disabled-bg: rgba(196, 149, 106, 0.6);
+  --color-btn-primary-disabled-border: rgba(196, 149, 106, 0.4);
+
+  --color-fg-default: #EBE0D0;
+  --color-fg-muted: #B8A898;
+  --color-fg-subtle: #4A3B32;
+
+  --color-canvas-default: #241E19;
+  --color-canvas-overlay: #2F2722;
+  --color-canvas-inset: #1a1510;
+  --color-canvas-subtle: #2F2722;
+
+  --color-border-default: #4A3B32;
+  --color-border-muted: rgba(74, 59, 50, 0.6);
+  --color-border-overlay: #4A3B32;
+
+  --color-neutral-muted: rgba(74, 59, 50, 0.4);
+  --color-neutral-subtle: rgba(74, 59, 50, 0.2);
+
+  --color-accent-fg: #C4956A;
+  --color-accent-emphasis: #C4956A;
+  --color-accent-muted: rgba(196, 149, 106, 0.4);
+  --color-accent-subtle: rgba(196, 149, 106, 0.15);
+
+  --color-success-fg: #B8A898;
+  --color-attention-fg: #C4956A;
+  --color-danger-fg: #c46a5a;
+  --color-danger-subtle: rgba(196, 106, 90, 0.15);
+  --color-done-fg: #C4956A;
+
+  --color-scale-gray-1: #2F2722;
+  --color-scale-gray-2: #3a302a;
+  --color-scale-gray-3: #4A3B32;
+  --color-scale-gray-4: #B8A898;
+  --color-scale-gray-5: #d0c4b4;
+  --color-scale-gray-6: #EBE0D0;
+  --color-scale-gray-7: #f5f0e8;
+
+  --color-scale-blue-1: rgba(196, 149, 106, 0.2);
+
+  color-scheme: dark;
+}
+
+main .gsc-comment-box {
+  border-color: #4A3B32;
+  background-color: #241E19;
+}
+
+main .gsc-comment-box:focus-within {
+  border-color: #C4956A;
+}
+
+main .gsc-comment {
+  background-color: #241E19;
+}
+
+main .gsc-timeline {
+  border-color: rgba(74, 59, 50, 0.6);
+}
+
+main .gsc-header .gsc-left-header em {
+  color: #B8A898;
+}
+
+main .gsc-reply-box {
+  border-color: #4A3B32;
+  background-color: #241E19;
+}

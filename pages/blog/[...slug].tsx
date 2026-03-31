@@ -16,20 +16,33 @@ type PostProps = {
 };
 
 const Post: NextPage<PostProps> = ({ postData }) => {
-    const [liked, setLiked] = useState(false);
-    const [likeCount, setLikeCount] = useState(0);
+    const [reactionCount, setReactionCount] = useState(0);
     const [copied, setCopied] = useState(false);
 
-
-    // Load like state from localStorage on mount
+    // Listen for Giscus metadata to get real reaction counts from GitHub Discussions
     useEffect(() => {
-        const storedLike = localStorage.getItem(`like-${postData.id}`);
-        if (storedLike === 'true') {
-            setLiked(true);
-            setLikeCount(1);
-        }
-    }, [postData.id]);
+        const handleMessage = (event: MessageEvent) => {
+            if (event.origin !== 'https://giscus.app') return;
+            if (!event.data || !event.data.giscus) return;
 
+            const giscusData = event.data.giscus;
+
+            // discussion metadata contains reaction count
+            if (giscusData.discussion) {
+                setReactionCount(giscusData.discussion.totalReactionCount ?? 0);
+            }
+        };
+
+        window.addEventListener('message', handleMessage);
+        return () => window.removeEventListener('message', handleMessage);
+    }, []);
+
+    const scrollToReactions = () => {
+        const commentSection = document.getElementById('comments-section');
+        if (commentSection) {
+            commentSection.scrollIntoView({ behavior: 'smooth' });
+        }
+    };
 
     const scrollToComments = () => {
         const commentSection = document.getElementById('comments-section');
@@ -45,13 +58,6 @@ const Post: NextPage<PostProps> = ({ postData }) => {
             day: 'numeric',
             year: 'numeric',
         }).toUpperCase();
-    };
-
-    const handleLike = () => {
-        const newLikedState = !liked;
-        setLiked(newLikedState);
-        setLikeCount(newLikedState ? 1 : 0);
-        localStorage.setItem(`like-${postData.id}`, newLikedState.toString());
     };
 
     const handleShare = async () => {
@@ -90,12 +96,13 @@ const Post: NextPage<PostProps> = ({ postData }) => {
                     <aside className="hidden lg:block sticky top-32 self-start">
                         <div className="flex flex-col gap-6">
                             <button
-                                onClick={handleLike}
+                                onClick={scrollToReactions}
                                 className="flex flex-col items-center gap-2 group transition-transform active:scale-95"
+                                title="React on this post"
                             >
                                 <svg
-                                    className={`w-6 h-6 transition-all ${liked ? 'fill-red-500 stroke-red-500' : 'group-hover:stroke-red-500'}`}
-                                    style={{ color: liked ? '#ef4444' : 'rgb(var(--color-text-muted))' }}
+                                    className={`w-6 h-6 transition-all ${reactionCount > 0 ? 'fill-red-500 stroke-red-500' : 'group-hover:stroke-red-500'}`}
+                                    style={{ color: reactionCount > 0 ? '#ef4444' : 'rgb(var(--color-text-muted))' }}
                                     xmlns="http://www.w3.org/2000/svg"
                                     viewBox="0 0 24 24"
                                     fill="none"
@@ -106,20 +113,15 @@ const Post: NextPage<PostProps> = ({ postData }) => {
                                 >
                                     <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
                                 </svg>
-                                <span className={`text-xs ${liked ? 'text-red-500' : ''}`} style={{ color: liked ? '#ef4444' : 'rgb(var(--color-text-muted))' }}>{likeCount}</span>
+                                <span className={`text-xs ${reactionCount > 0 ? 'text-red-500' : ''}`} style={{ color: reactionCount > 0 ? '#ef4444' : 'rgb(var(--color-text-muted))' }}>{reactionCount}</span>
                             </button>
 
                             <button
                                 onClick={handleShare}
-                                className="flex flex-col items-center gap-2 group relative transition-transform active:scale-95"
+                                className="flex flex-col items-center gap-2 group transition-transform active:scale-95"
                             >
-                                {copied && (
-                                    <span className="absolute left-full ml-2 px-2 py-1 text-xs bg-black text-white rounded whitespace-nowrap opacity-80">
-                                        Copied!
-                                    </span>
-                                )}
                                 <svg
-                                    className={`w-5 h-5 transition-all group-hover:fill-current ${copied ? 'stroke-blue-500' : ''}`}
+                                    className={`w-5 h-5 transition-all ${copied ? 'stroke-blue-500' : 'group-hover:stroke-blue-500'}`}
                                     style={{ color: copied ? '#3b82f6' : 'rgb(var(--color-text-muted))' }}
                                     xmlns="http://www.w3.org/2000/svg"
                                     viewBox="0 0 24 24"
@@ -129,10 +131,11 @@ const Post: NextPage<PostProps> = ({ postData }) => {
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
                                 >
-                                    <path d="M7 10v12" />
-                                    <path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2h0a3.13 3.13 0 0 1 3 3.88Z" />
+                                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+                                    <polyline points="16 6 12 2 8 6" />
+                                    <line x1="12" y1="2" x2="12" y2="15" />
                                 </svg>
-                                <span className="text-xs" style={{ color: 'rgb(var(--color-text-muted))' }}>Share</span>
+                                <span className="text-xs" style={{ color: copied ? '#3b82f6' : 'rgb(var(--color-text-muted))' }}>{copied ? 'Copied!' : 'Share'}</span>
                             </button>
 
                             <button

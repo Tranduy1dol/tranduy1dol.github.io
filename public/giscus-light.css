@@ -1,0 +1,119 @@
+/*! Custom Giscus theme — "Old Newspaper" light theme for tranduy1dol.github.io */
+
+main {
+  --color-prettylights-syntax-comment: #6B6560;
+  --color-prettylights-syntax-constant: #8B7355;
+  --color-prettylights-syntax-entity: #6B6560;
+  --color-prettylights-syntax-storage-modifier-import: #2B2B2B;
+  --color-prettylights-syntax-entity-tag: #8B7355;
+  --color-prettylights-syntax-keyword: #8B7355;
+  --color-prettylights-syntax-string: #6B6560;
+  --color-prettylights-syntax-variable: #8B7355;
+  --color-prettylights-syntax-brackethighlighter-unmatched: #A8A29E;
+  --color-prettylights-syntax-invalid-illegal-text: #EFEEE8;
+  --color-prettylights-syntax-invalid-illegal-bg: #8B7355;
+  --color-prettylights-syntax-carriage-return-text: #EFEEE8;
+  --color-prettylights-syntax-carriage-return-bg: #8B7355;
+  --color-prettylights-syntax-string-regexp: #8B7355;
+  --color-prettylights-syntax-markup-list: #6B6560;
+  --color-prettylights-syntax-markup-heading: #2B2B2B;
+  --color-prettylights-syntax-markup-italic: #2B2B2B;
+  --color-prettylights-syntax-markup-bold: #2B2B2B;
+  --color-prettylights-syntax-markup-deleted-text: #8B7355;
+  --color-prettylights-syntax-markup-deleted-bg: #E8E6DF;
+  --color-prettylights-syntax-markup-inserted-text: #8B7355;
+  --color-prettylights-syntax-markup-inserted-bg: #E8E6DF;
+  --color-prettylights-syntax-markup-changed-text: #8B7355;
+  --color-prettylights-syntax-markup-changed-bg: #E8E6DF;
+  --color-prettylights-syntax-markup-ignored-text: #A8A29E;
+  --color-prettylights-syntax-markup-ignored-bg: #E8E6DF;
+  --color-prettylights-syntax-meta-diff-range: #8B7355;
+  --color-prettylights-syntax-sublimelinter-gutter-mark: #A8A29E;
+
+  --color-btn-text: #2B2B2B;
+  --color-btn-bg: #E8E6DF;
+  --color-btn-border: #A8A29E;
+  --color-btn-shadow: 0 0 transparent;
+  --color-btn-inset-shadow: 0 0 transparent;
+  --color-btn-hover-bg: #EFEEE8;
+  --color-btn-hover-border: #A8A29E;
+  --color-btn-active-bg: #E8E6DF;
+  --color-btn-active-border: #A8A29E;
+  --color-btn-selected-bg: #E8E6DF;
+  --color-btn-primary-text: #EFEEE8;
+  --color-btn-primary-bg: #8B7355;
+  --color-btn-primary-border: #8B7355;
+  --color-btn-primary-shadow: 0 0 transparent;
+  --color-btn-primary-inset-shadow: 0 0 transparent;
+  --color-btn-primary-hover-bg: #7a6548;
+  --color-btn-primary-hover-border: #7a6548;
+  --color-btn-primary-selected-bg: #8B7355;
+  --color-btn-primary-disabled-text: rgba(239, 238, 232, 0.5);
+  --color-btn-primary-disabled-bg: rgba(139, 115, 85, 0.6);
+  --color-btn-primary-disabled-border: rgba(139, 115, 85, 0.4);
+
+  --color-fg-default: #2B2B2B;
+  --color-fg-muted: #6B6560;
+  --color-fg-subtle: #A8A29E;
+
+  --color-canvas-default: #EFEEE8;
+  --color-canvas-overlay: #EFEEE8;
+  --color-canvas-inset: #E8E6DF;
+  --color-canvas-subtle: #E8E6DF;
+
+  --color-border-default: #A8A29E;
+  --color-border-muted: rgba(168, 162, 158, 0.4);
+  --color-border-overlay: #A8A29E;
+
+  --color-neutral-muted: rgba(168, 162, 158, 0.2);
+  --color-neutral-subtle: rgba(168, 162, 158, 0.1);
+
+  --color-accent-fg: #8B7355;
+  --color-accent-emphasis: #8B7355;
+  --color-accent-muted: rgba(139, 115, 85, 0.4);
+  --color-accent-subtle: rgba(139, 115, 85, 0.1);
+
+  --color-success-fg: #6B6560;
+  --color-attention-fg: #8B7355;
+  --color-danger-fg: #9e5a4a;
+  --color-danger-subtle: rgba(158, 90, 74, 0.1);
+  --color-done-fg: #8B7355;
+
+  --color-scale-gray-1: #E8E6DF;
+  --color-scale-gray-2: #d5d0c7;
+  --color-scale-gray-3: #A8A29E;
+  --color-scale-gray-4: #6B6560;
+  --color-scale-gray-5: #4a4540;
+  --color-scale-gray-6: #2B2B2B;
+  --color-scale-gray-7: #1a1a1a;
+
+  --color-scale-blue-1: rgba(139, 115, 85, 0.15);
+
+  color-scheme: light;
+}
+
+main .gsc-comment-box {
+  border-color: #A8A29E;
+  background-color: #EFEEE8;
+}
+
+main .gsc-comment-box:focus-within {
+  border-color: #8B7355;
+}
+
+main .gsc-comment {
+  background-color: #EFEEE8;
+}
+
+main .gsc-timeline {
+  border-color: rgba(168, 162, 158, 0.4);
+}
+
+main .gsc-header .gsc-left-header em {
+  color: #6B6560;
+}
+
+main .gsc-reply-box {
+  border-color: #A8A29E;
+  background-color: #EFEEE8;
+}

@@ -1,8 +1,23 @@
 import Giscus from '@giscus/react';
 import { useTheme } from 'next-themes';
+import { useEffect, useState } from 'react';
+
+const SITE_URL = 'https://tranduy1dol.github.io';
 
 export default function Comments() {
     const { resolvedTheme } = useTheme();
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    if (!mounted) return null;
+
+    // Use custom CSS themes hosted in /public so Giscus iframe matches the site
+    const giscusTheme = resolvedTheme === 'dark'
+        ? `${SITE_URL}/giscus-dark.css`
+        : `${SITE_URL}/giscus-light.css`;
 
     return (
         <Giscus
@@ -14,10 +29,10 @@ export default function Comments() {
             mapping="pathname"
             strict="0"
             reactionsEnabled="1"
-            emitMetadata="0"
+            emitMetadata="1"
             inputPosition="bottom"
-            theme={resolvedTheme === 'dark' ? 'dark_tritanopia' : 'light'}
-            lang="vi"
+            theme={giscusTheme}
+            lang="en"
             loading="lazy"
         />
     );
