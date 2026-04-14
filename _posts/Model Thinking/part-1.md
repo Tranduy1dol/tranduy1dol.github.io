@@ -18,7 +18,7 @@ Có 4 lý do chính mình được học:
 
 1. Mô hình giúp chúng ta trở thành công dân thông minh
 
-Lý do đơn giản là mô hình tốt hơn. Việc sử dụng mô hình giúp suy nghĩ của chúng ta trở lên logic. Khi đối mặt với một vấn đề, vô vàn ý tưởng sẽ chạy lung tung trong đầu. Một mô hình tốt sẽ đóng vai trò như chiếc xương sống, giúp ta phân loại và sắp xếp những luồng suy nghĩ đó một cách rành mạch. Nhưng khi có mô hình làm xương sống, việc sắp xếp suy nghĩ trở nên đơn giản hơn. Ngoài ra, mô hình cũng làm chúng ta khiếm tốn hơn.
+Lý do đơn giản là mô hình tốt hơn. Việc sử dụng mô hình giúp suy nghĩ của chúng ta trở lên logic. Khi đối mặt với một vấn đề, vô vàn ý tưởng sẽ chạy lung tung trong đầu. Một mô hình tốt sẽ đóng vai trò như chiếc xương sống, giúp ta phân loại và sắp xếp những luồng suy nghĩ đó một cách rành mạch. Ngoài ra, mô hình cũng làm chúng ta khiếm tốn hơn.
 
 2. Mô hình giúp chúng ta suy nghĩ rõ ràng
 
