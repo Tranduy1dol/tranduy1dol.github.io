@@ -74,7 +74,7 @@ Mô hình này giải thích cách đám đông đưa ra quyết định tham gi
 Khám phá vĩ đại nhất của mô hình này là **"Cái đuôi vẫy con chó" (The tail wags the dog)**: Kết quả của một hành vi tập thể phụ thuộc vào sự phân bổ của các ngưỡng **(variance/distribution)** nhiều hơn là giá trị trung bình của các ngưỡng. Ví dụ: 
 
 - Một nhóm 5 người có ngưỡng lần lượt là $1,1,2,2,2$. Dù trung bình ngưỡng thấp, không ai sẽ hành động khi không có "kẻ chủ mưu" (ngưỡng bằng 0).
-- Nhóm 5 người có ngưỡng lần lượt là $0,1,2,3,4$ có trung bình ngưỡng cao hơn, nhưng lại tạo ra hiệu ứng domino: người 0 hành động, kéo theo người 1, kéo theo người 2, ... Sự đa dạng ở phần đuôi phan bố (những người có ngưỡng cực thấp) quyết định sự bùng nổ của hệ thống.
+- Nhóm 5 người có ngưỡng lần lượt là $0,1,2,3,4$ có trung bình ngưỡng cao hơn, nhưng lại tạo ra hiệu ứng domino: người 0 hành động, kéo theo người 1, kéo theo người 2, ... Sự đa dạng ở phần đuôi phân bố (những người có ngưỡng cực thấp) quyết định sự bùng nổ của hệ thống.
 
 ## Hiện tượng vỗ tay tán thưởng (The Standing Ovation Problem)
 
