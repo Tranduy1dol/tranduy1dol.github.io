@@ -1,7 +1,7 @@
 ---
 title: Đa dạng và Trí tuệ đám đông
 date: 2026-04-14
-excerpt: Bài này nói về sự đa dạng trong khả năng tư duy
+excerpt: Khám phá tại sao "sự đa dạng đánh bại năng lực" và cách đám đông có thể dự đoán chính xác hơn các chuyên gia.
 category: LEARNING
 ---
 ## Giới thiệu
