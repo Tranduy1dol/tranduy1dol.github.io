@@ -4,6 +4,7 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { FiArrowLeft } from 'react-icons/fi';
 import dynamic from 'next/dynamic';
+import { useTheme } from 'next-themes';
 
 const Comments = dynamic(() => import('@/components/Comments'), {
     ssr: false,
@@ -21,6 +22,7 @@ const Post: NextPage<PostProps> = ({ postData }) => {
     const [reactionCount, setReactionCount] = useState(0);
     const [commentCount, setCommentCount] = useState(0);
     const [copied, setCopied] = useState(false);
+    const { resolvedTheme } = useTheme();
 
     // Listen for Giscus metadata to get reaction + comment counts
     useEffect(() => {
@@ -43,6 +45,39 @@ const Post: NextPage<PostProps> = ({ postData }) => {
         window.addEventListener('message', handleMessage);
         return () => window.removeEventListener('message', handleMessage);
     }, []);
+
+    useEffect(() => {
+        const initMermaid = async () => {
+            try {
+                const mermaid = (await import('mermaid')).default;
+                mermaid.initialize({ startOnLoad: false, theme: resolvedTheme === 'dark' ? 'dark' : 'default' });
+                // Mermaid looks for elements with class 'language-mermaid' in markdown
+                await mermaid.run({ querySelector: '.language-mermaid' });
+            } catch (err) {
+                console.error('Mermaid initialization failed:', err);
+            }
+        };
+        
+        // Timeout to ensure DOM is fully parsed and rendered
+        const timeoutId = setTimeout(() => {
+            const mermaidElements = document.querySelectorAll('.language-mermaid');
+            mermaidElements.forEach(el => {
+                // Store the original text to allow re-rendering when theme changes
+                if (!el.hasAttribute('data-mermaid-text')) {
+                    el.setAttribute('data-mermaid-text', el.textContent || '');
+                } else {
+                    el.textContent = el.getAttribute('data-mermaid-text') || '';
+                }
+                // Remove the `data-processed` attribute if it was already processed, allowing re-render
+                el.removeAttribute('data-processed');
+            });
+            if (mermaidElements.length > 0) {
+                initMermaid();
+            }
+        }, 100);
+
+        return () => clearTimeout(timeoutId);
+    }, [postData.contentHtml, resolvedTheme]);
 
     const scrollToReactions = () => {
         const commentSection = document.getElementById('comments-section');

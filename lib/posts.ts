@@ -9,6 +9,7 @@ import remarkRehype from 'remark-rehype';
 import rehypeKatex from 'rehype-katex';
 import rehypeSlug from 'rehype-slug';
 import rehypeStringify from 'rehype-stringify';
+import rehypeHighlight from 'rehype-highlight';
 import GithubSlugger from 'github-slugger';
 
 
@@ -237,6 +238,8 @@ export async function getPostData(slug: string[]): Promise<PostData> {
         .use(remarkMath)
         .use(remarkRehype)
         .use(rehypeKatex)
+        // @ts-expect-error: Options type parameter is not explicitly provided in the library definition, causing a mismatch
+        .use(rehypeHighlight, { ignoreMissing: true })
         .use(rehypeSlug)
         .use(rehypeStringify)
         .process(contentWithFixedImages);
