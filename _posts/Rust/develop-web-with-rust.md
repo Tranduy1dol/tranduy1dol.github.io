@@ -1,16 +1,16 @@
 ---
 title: Giới thiệu về lập trình Backend bằng Rust
 date: 2026-04-16
-excerpt: Cách tôi ráp nối các mảnh ghép để tạo ra một Backend E-commerce bằng Rust
+excerpt: Cách mình code một Backend E-Commerce bằng Rust để đưa vào CV
 category: CODING
 ---
 ## Giới thiệu
 
-Mình tiếp xúc với Rust đến nay cũng là hai năm rồi. Cách tiếp cận Rust của mình như thế này: xem người khác code như thế nào, code theo, điều chỉnh lại thành ý tưởng của mình. Dù cách này khá hiệu quả thời gian đầu, mình không bị ngợp khi tiếp xúc code mới. Nhưng về lâu dài càng, mình sẽ bị tụt lại dần vì không chịu tìm hiểu các khái niệm, thư viện cũng như các lý thuyết.
+Mình tiếp xúc với Rust đến nay cũng là hai năm rồi. Cách tiếp cận Rust của mình như thế này: xem người khác code như thế nào hoặc đọc sách, code theo, điều chỉnh lại thành ý tưởng của mình. Dù cách này khá hiệu quả thời gian đầu, mình không bị ngợp khi tiếp xúc code mới. Nhưng về lâu dài càng, mình sẽ bị tụt lại dần vì không chịu tìm hiểu các khái niệm, thư viện cũng như các lý thuyết.
 
 Sau khi nhận được feedback từ một vài người phỏng vấn, mình nhận ra đa số các vấn đề họ hỏi, mình đã đều tiếp xúc khi code, vấn đề của mình là không thể nhớ cách dùng, cách hoạt động của các khái niệm, công cụ đó.
 
-Bài này sẽ giải thích các công cụ mình dùng, cách mình triển khai chúng trong một dự án Backend phục vụ E-commerce, là một dự án mình vất vào CV để nhà tuyển dụng biết rằng mình có kiến thức về lập trình web.
+Bài này sẽ giải thích các công cụ mình dùng, cách mình triển khai chúng trong một dự án Backend phục vụ E-commerce.
 
 ## Kiến trúc hệ thống
 
@@ -18,80 +18,34 @@ Một hệ thống web hoàn chỉnh sẽ bao gồm rất nhiều thành phần:
 
 Để giải quyết bài toán này, mình áp dụng mô hình **Clean Architecture** kết hợp sức mạnh của **Cargo Workspace** có sẵn trong hệ sinh thái Rust.
 
-### Áp dụng Clean Architecture với Cargo Workspace
+### Clean Architecture và Cargo Workspace
 
 Clean Architecture nhấn mạnh vào nguyên lý **Dependency Inversion** (Đảo ngược phụ thuộc). Tức là, thay vì logic cốt lõi (Domain/Business logic) phụ thuộc vào những thứ râu ria (Database, Framework, Third-party), thì mọi thứ râu ria phải phụ thuộc ngược lại vào logic cốt lõi.
 
-Rust có một cơ chế tuyệt vời để ép buộc điều này rất tự nhiên: **Cargo Workspace**. Hệ thống build của Rust sẽ kiểm tra gắt gao các dependency giữa các Cargo crate ngay lúc compile (Compile-time). Quy tắc là: tầng `core` không khai báo `sea-orm` hay `redis` trong phần `[dependencies]`, thì bạn sẽ không bao giờ có thể "import nhầm" hoặc vô tình gọi các hàm liên quan đến Database vào trong vùng code nghiệp vụ. Nó gỡ bỏ hoàn toàn nỗi lo developer phá vỡ kiến trúc!
+Rust có một cơ chế để thuận tiện triển khai: **Cargo Workspace**. Hệ thống build của Rust sẽ kiểm tra các dependency giữa các cargo crate tại compile-time. Quy tắc là: crate `core` sẽ không import các crate tương tác với Database hay HTTP Web Server trong phần `[dependencies]`, và `core` sẽ khai báo các inteface cho các crate khác. Làm vậy thì đảm bảo code có cấu trúc, người ngoài đọc sẽ dễ hiểu, và đảm bảo khả năng mở rộng khi muốn thay đổi công cụ.
 
-Sơ đồ tổ chức phụ thuộc của dự án:
+Kiến trúc được mình triển khai như sau:
 
-```mermaid
-graph TD
-    subgraph Cargo Workspace
-    APP(crates/app<br><i>Web Framework: Axum</i>)
-    INFRA(crates/infra<br><i>Database: SeaORM, Redis</i>)
-    CORE(crates/core<br><i>Business Logic & Ports</i>)
-    ENT(crates/entities<br><i>Data Models</i>)
-    MIG(crates/migration<br><i>DB Schema</i>)
-    end
+- **`crates/core`**: Đây là nơi chứa toàn bộ cốt lõi nghiệp vụ (Business logic): Services (User, Product, Cart), Authentication (JWT), Error Definition, và định nghĩa các **Ports** (các Traits/Interfaces cho các kho chứa dữ liệu). Crate này **KHÔNG** hề biết đến sự tồn tại của Postgres, Redis hay HTTP. Nó đảm bảo logic của hệ thống hoàn toàn cô lập, dễ debug và dễ test nhất.
 
-    %% Dependency flow
-    APP -->|Tuyệt đối không skip Core| CORE
-    APP -->|Tiêm dependencies lúc init| INFRA
-    INFRA -->|Implement Ports| CORE
-    INFRA -.->|Query dữ liệu| ENT
-    MIG -.->|Gắn liền với| ENT
+- **`crates/infra`**: Là crate hạ tầng kỹ thuật. Crate này là cài đặt các interface được yêu cầu trong `core` sử dụng các thư viện cụ thể. Nơi đây chứa adapter kết nối Redis, code gọi SeaORM để thao tác dữ liệu. Nếu có thay đổi từ PostgresQL thành MongoDB, mình cũng sẽ cài đặt ở đây.
 
-    %% Styling
-    classDef core fill:#ffcc00,stroke:#d4a000,stroke-width:2px,color:#000;
-    classDef app fill:#4facfe,stroke:#2a82d0,stroke-width:2px,color:#fff;
-    classDef infra fill:#43e97b,stroke:#2cad55,stroke-width:2px,color:#fff;
-    classDef db fill:#b8c6db,stroke:#8f9ba8,stroke-width:2px,color:#000;
+- **`crates/app`**: là cửa sổ để hệ thống giao tiếp thông qua HTTP Transport. Ở đây tích hợp **Axum**, thiết lập Routing, quản lý AppState, nhận các DTO từ người dùng và inject các implementation từ `infra` vào biến khởi tạo của `core` trong file `main.rs`.
 
-    class CORE core;
-    class APP app;
-    class INFRA infra;
-    class ENT,MIG db;
-```
+- **`crates/entities` & `crates/migration` (Schema Base)**: Hai crate này đi liền với sự hỗ trợ từ hệ sinh thái `SeaORM`. Crate `entities` đóng vai trò như một thư viện Type definition cho các table PostgreSQL, trong khi đó `migration` thiết lập công cụ giúp team quản lý được versioning của database.
 
-Dựa vào sơ đồ trên, kiến trúc được mình phận lớp và cài đặt như sau:
+## Web Server & Routing (Giao tiếp HTTP)
 
-- **`crates/core` (Trái tim của dự án)**
-  Đây là nơi chứa toàn bộ cốt lõi nghiệp vụ (Business logic): Services (User, Product, Cart), Authentication (JWT), Error Definition, và định nghĩa các **Ports** (các Traits/Interfaces cho các kho chứa dữ liệu). Crate này **KHÔNG** hề biết đến sự tồn tại của Postgres, Redis hay HTTP. Nó đảm bảo logic của hệ thống hoàn toàn cô lập, dễ debug và dễ test nhất.
-
-- **`crates/infra` (Tầng hạ tầng kỹ thuật)**
-  Nắm giữ các logic kỹ thuật. Nhiệm vụ của crate này là nhìn vào các yêu cầu (Interface / Ports) do `core` đề ra, và tiến hành cài đặt (Implement) chúng sử dụng các thư viện cụ thể. Nơi đây chứa adapter kết nối Redis, code gọi SeaORM để thao tác dữ liệu. Nếu sau này mình có quyết định đổi Postgres thành MongoDB, thì chỉ việc đụng tới thư mục `infra` này, layer ở `core` và `app` hoàn toàn bất động.
-
-- **`crates/app` (Tầng giao tiếp)**
-  Tầng trên cùng, là cửa sổ để hệ thống giao tiếp với thế giới bên ngoài thông qua HTTP Transport. Ở đây tích hợp **Axum**, thiết lập Routing, quản lý AppState, nhận các DTO từ người dùng và tiêm (inject) các implementation từ `infra` vào biến khởi tạo của `core` trong file `main.rs`.
-
-- **`crates/entities` & `crates/migration` (Schema Base)**
-  Hai crate này đi liền với sự hỗ trợ từ hệ sinh thái `SeaORM`. Crate `entities` đóng vai trò như một thư viện Type definition cho các table PostgreSQL, trong khi đó `migration` thiết lập công cụ giúp team quản lý được versioning của database.
-
-Nhờ việc chia rẽ triệt để này, mình tự tin kiểm soát được scope của bất kỳ bug nào: Lỗi ở nghiệp vụ thì mò vào `core`, lỗi do query dữ liệu sai thì tìm ở `infra`, còn lỗi do payload HTTP sai định dạng thì tìm ở `app`.
-
-### Web Server & Routing (Giao tiếp HTTP)
-
-#### Vấn đề
-
-Khi xây dựng một hệ thống E-commerce, tầng HTTP là "cổng trước" tiếp nhận mọi request từ client. Mình cần một web framework đáp ứng được:
+Khi xây dựng một hệ thống E-commerce, tầng HTTP là "cổng trước" tiếp nhận mọi request từ client. Mình dùng Axum vì:
 
 1. **Hiệu suất cao** — Xử lý hàng ngàn request đồng thời mà không block thread.
 2. **Type-safe** — Tận dụng hệ thống type của Rust để bắt lỗi tại compile-time thay vì runtime.
 3. **Quản lý routing rõ ràng** — Dễ dàng gom nhóm, versioning API, gắn middleware cho từng nhóm route.
+4. Axum dễ cài đặt hơn các framework khác (Actix, Rocket).
 
-#### Tại sao chọn Axum?
+### Cấu trúc Routing: Versioning & Module hóa
 
-Mình chọn [Axum](https://github.com/tokio-rs/axum) vì những lý do sau:
-
-- **Được phát triển bởi nhóm Tokio** — Axum tích hợp trực tiếp với Tokio runtime, cùng hệ sinh thái `tower` và `hyper`. Điều này đồng nghĩa với việc không có overhead trung gian, mọi thứ chạy native trên async runtime phổ biến nhất của Rust.
-- **Không dùng macro** — Khác với Actix-web hay Rocket sử dụng proc-macro để đánh dấu handler (`#[get("/")]`), Axum dùng hệ thống type thuần tuý (trait `FromRequest`, `IntoResponse`). Điều này giúp error message rõ ràng hơn khi compile lỗi, và dễ debug hơn.
-- **Extractor pattern** — Đây là tính năng mình thích nhất. Mọi thứ cần thiết cho handler (state, body, query, header, authentication...) đều được "rút ra" từ request thông qua Extractors, compiler sẽ kiểm tra type cho mình.
-
-#### Cấu trúc Routing: Versioning & Module hóa
-
-Trong thực tế, API thường được nhóm theo version (`/api/v1/...`) để dễ dàng nâng cấp mà không break client cũ. Mình tổ chức routing trong file `crates/app/src/router.rs` như sau:
+Trong thực tế, API thường được nhóm theo version (`/api/v1/...`) để dễ nâng cấp mà không break client cũ. Routing trong file `crates/app/src/router.rs` được tổ chức như sau:
 
 ```rust
 // crates/app/src/router.rs
@@ -132,7 +86,7 @@ pub fn routes(state: AppState) -> Router {
 }
 ```
 
-#### AppState: Chia sẻ tài nguyên một cách an toàn
+### AppState: Chia sẻ tài nguyên
 
 Một vấn đề quan trọng: **làm sao các handler truy cập được Database Pool, Redis Client, hay các Service?** Câu trả lời là `AppState` — một struct được truyền vào toàn bộ router và mọi handler đều có thể extract ra.
 
@@ -158,7 +112,7 @@ pub struct AppState {
 
 Tại sao dùng `Arc<T>` mà không phải `T` trực tiếp? Vì Axum cần `AppState` implement `Clone` để chia sẻ giữa nhiều task async chạy đồng thời. Nếu mỗi Service chứa connection pool bên trong, ta không muốn clone cả pool — `Arc` cho phép nhiều handler **trỏ tới cùng một instance** của Service, và từ đó cùng một connection pool.
 
-Trong `main.rs`, mình "ráp nối" mọi thứ lại:
+Mình đặt tất cả mọi thứ trong `main.rs` như sau:
 
 ```rust
 // crates/app/src/main.rs (rút gọn)
@@ -198,7 +152,7 @@ async fn main() -> anyhow::Result<()> {
 
 Dòng chảy rất rõ ràng: **Config → Pool → Repository → Service → AppState → Router → Server**. Mỗi tầng chỉ biết tầng ngay bên dưới, đúng nguyên tắc Clean Architecture.
 
-#### Extractors: "Phép thuật" của Axum
+### Extractors
 
 Extractor là cách Axum cho phép handler khai báo "tôi cần gì" từ một HTTP request. Compiler sẽ tự động gọi logic extract tương ứng. Nhìn vào handler `add_item`:
 
@@ -268,23 +222,23 @@ where
 
 Điều hay ho ở đây là `JwtAuth` sử dụng `AppState::from_ref(state)` để lấy `AuthService` — nghĩa là logic verify token nằm hoàn toàn ở tầng `core`, không bị ràng buộc với HTTP framework. Nếu mai sau mình đổi sang framework khác, logic xác thực không cần viết lại.
 
-Khi muốn bảo vệ một route, chỉ cần thêm `JwtAuth(claims): JwtAuth` vào tham số handler — không cần cấu hình middleware riêng, không cần decorator. Nhìn lại bảng route ở trên, các endpoint Cart và Checkout đều có `JwtAuth`, trong khi User và Product thì không. Sự phân biệt này được thể hiện rõ ràng ngay trong function signature.
+Khi muốn bảo vệ một route, chỉ cần thêm `JwtAuth(claims): JwtAuth` vào tham số handler — không cần cấu hình middleware riêng, không cần decorator.
 
 
-### Tương tác Cơ sở dữ liệu & Caching (Data Persistence)
+## Tương tác Cơ sở dữ liệu & Caching (Data Persistence)
 
-#### Vấn đề 1: Tương tác an toàn với PostgreSQL
+### Tương tác với PostgreSQL
 
 Khi xây dựng một ứng dụng back-end, tương tác với Database là việc bắt buộc. Nhưng để hệ thống sống sót trên môi trường Production, mình phải đảm bảo:
 - **An toàn:** Tránh các lỗi liên quan đến SQL Injection.
 - **Tiện lợi:** Map được dữ liệu từ các table của SQL về các Struct (Object) của Rust.
 - **Dễ bảo trì:** Quản lý được phiên bản database schema (Migrations) để làm việc với các thành viên khác trong team hoặc deploy lên server.
 
-#### Giải pháp 1: Dùng SeaORM - Async ORM mạnh mẽ của Rust
+#### SeaORM
 
-Sau khi cân nhắc giữa `sqlx` (viết raw query) và `SeaORM`, mình đã quyết định [SeaORM](https://www.sea-ql.org/SeaORM/). Đây là một async ORM hỗ trợ hoàn hảo cho hệ sinh thái của `tokio`. 
+Để tránh việc viết raw query có thể có lỗi, mình đã quyết định [SeaORM](https://www.sea-ql.org/SeaORM/). Đây là một async ORM hỗ trợ hoàn hảo cho hệ sinh thái của `tokio`. 
 
-**1. Quản lý database schema bằng Migrations**
+##### Quản lý database schema bằng Migrations
 
 Trong `shopping-cart`, mình tách biệt thư mục `crates/migration` để chịu trách nhiệm chuyên biệt cho việc lên schema. Mỗi khi muốn thêm bảng, mình chỉ cần dùng SeaORM CLI để tạo ra một file migration. 
 
@@ -327,9 +281,9 @@ enum Product {
 }
 ```
 
-Nhờ viết bằng Rust, IDE sẽ kiểm tra lỗi giùm mình thay vì viết text raw SQL rất dễ bị sai đánh máy. Function `up()` được chạy khi update DB, và `down()` được chạy nếu muốn rollback (rất tiện để dọn deẹp DB).
+Function `up()` được chạy khi update DB, và `down()` được chạy nếu muốn rollback.
 
-**2. CRUD dữ liệu với Repository Pattern**
+##### CRUD dữ liệu với Repository Pattern
 
 Việc tương tác dữ liệu mình cài đặt nó trong `crates/infra/src/database/`. Ví dụ với hàm lấy danh sách bảng `Product` có hỗ trợ phân trang (Pagination):
 
@@ -357,13 +311,10 @@ impl ProductRepository for SeaOrmProductRepo {
 
 SeaORM cung cấp sẵn API `.paginate()`, vì thế mình không cần viết câu lệnh `LIMIT` / `OFFSET` bằng tay và không cần tự `COUNT()` tổng số kết quả, giảm được code lặp lại (boilerplate) đáng kể.
 
-#### Vấn đề 2: Dữ liệu tạm thời (Giỏ hàng) gọi vào DB quá nhiều
+### Dữ liệu tạm thời (Giỏ hàng) gọi vào DB quá nhiều
 
-Trong domain của E-Commerce, mình nhận ra: **Giỏ hàng (Cart) của User thay đổi liên tục**. 
-
-User sẽ thêm, sửa, xoá sản phẩm khỏi giỏ hàng rất nhiều lần trước khi họ thực sự ấn "Thanh toán" (Checkout). Nếu với mọi thao tác thêm/bớt ấy, hệ thống đều chọc xuống PostgreSQL để thực hiện INSERT/UPDATE thì chẳng mấy chốc Database sẽ bị chịu tải vô ích đối với luồng dữ liệu ít quan trọng này. 
-
-#### Giải pháp 2: Sử dụng Redis làm Caching Layer cho Cart
+Trong domain của E-Commerce, Giỏ hàng (Cart) của User thay đổi liên tục. Cho đến khi thực sự thanh toán, user sẽ thực hiện nhiều thao tác thêm, sửa, xóa sản phẩm khỏi giỏ. Lượng lớn thao tác này khi xuống đến PostgesQL sẽ dễ dẫn đến quá tải. 
+#### Sử dụng Redis làm Caching Layer cho Cart
 
 Thay vì lưu Cart vào PostgreSQL, mình chọn dùng **Redis**. Redis lưu dữ liệu trực tiếp trên RAM của server nên mang lại tốc độ Read/Write gần như tức thời và làm giảm tải cực lớn cho database chính.
 
@@ -409,20 +360,88 @@ impl CartRepository for RedisCartRepository {
 }
 ```
 
-Điểm hay của thiết kế này:
+Lợi ích của việc này:
+
 1. **TTL (Time-To-Live):** Cùng với lệnh lưu `.set_ex()`, mình setup dữ liệu giỏ hàng sẽ tự động bị phân huỷ trong `24 * 60 * 60` giây (tức 24 giờ). Nếu User hôm nay tạo giỏ mà lại không mua, khối dữ liệu đó sẽ tự động bốc hơi, giải phóng bộ nhớ đáng quý của RAM (tránh lãng phí).
-2. **Serialization (Serde):** Nhờ cơ chế cực kỳ xịn xò của cặp đôi Serde `Serialize / Deserialize`, mình dễ dàng dùng `serde_json::to_string` để "đóng gói" toàn bộ cái Array giỏ hàng của Client thành 1 chuỗi String duy nhất để tống vào Redis, và lúc cần thiết thì lại dùng `serde_json::from_str` để "bật" nó ngược lại thành một Struct Rust hoàn chỉnh một cách an toàn.
+2. **Serialization (Serde):** Nhờ cơ chế Serde `Serialize / Deserialize`, mình dễ dàng dùng `serde_json::to_string` để "đóng gói" toàn bộ cái Array giỏ hàng của Client thành 1 chuỗi json string duy nhất để lưu vào Redis, và lúc cần thiết thì lại dùng `serde_json::from_str` để parse lại thành một Struct Rust hoàn chỉnh.
 
-#### V. Thành phần 4: Ràng buộc Dữ liệu & Tính đúng đắn (Validation & Business Logic)
+## Ràng buộc Dữ liệu & Tính đúng đắn (Validation & Business Logic)
 
-- **Vấn đề:** "Never trust user input" (Không bao giờ tin tưởng dữ liệu đầu vào). Cần lọc dữ liệu rác trước khi đưa xuống Database, đồng thời phải giải quyết các logic nghiệp vụ phức tạp (như xử lý tính toán số lượng tồn kho, gộp sản phẩm trùng trong giỏ).
+Một hệ thống đáng tin cậy phải chặn đứng dữ liệu rác (hoặc mang tính phá hoại) ngay từ "ngoài cửa". Đồng thời, logic hệ thống phải xử lý khôn khéo các rủi ro trong quá trình giao dịch (hết hàng, lỗi mạng, duplicate order). 
+
+Rút ra kinh nghiệm, mình gói gọn quy tắc thành: **Lọc dữ liệu tĩnh tại tầng DTO (vòng ngoài), và xử lý Domain Logic tại tầng Service (vòng trong)**.
+
+### Ràng buộc ở vòng ngoài bằng crate `validator`
+
+Để tránh viết nhiều hàm kiểm tra không cần thiết, mình dùng DTO (Data Transfer Object) và gắn các rule kiểm tra trực tiếp lên Struct thông qua crate `validator`.
+
+Xem một đoạn code ở file `crates/core/src/dto/user_dto.rs`:
+
+```rust
+// crates/core/src/dto/user_dto.rs
+
+use serde::{Deserialize, Serialize};
+use validator::Validate;
+use crate::validator::validate_password_strength;
+
+#[derive(Debug, Deserialize, Serialize, Validate)]
+#[serde(rename_all = "camelCase")]
+pub struct RegisterUserDto {
+    #[validate(length(min = 3, max = 50, message = "Username must be between 3 and 50 characters"))]
+    pub user_name: String,
     
-- **Cách tôi giải quyết:**
+    #[validate(email(message = "Email format is invalid"))]
+    pub email: String,
     
-    - Sử dụng crate `validator` tại tầng DTO (Data Transfer Object) để kiểm tra: độ dài chuỗi, giá trị lớn hơn 0... ngay tại HTTP Handler.
-        
-    - Trình bày ngắn gọn một đoạn logic nghiệp vụ thú vị mà bạn đã code (ví dụ: Logic `merge_cart_items` hoặc quá trình `checkout`).
-        
+    #[validate(
+        length(min = 8, max = 128),
+        custom(function = "validate_password_strength", message = "Password must contain at least 1 number and 1 uppercase letter")
+    )]
+    pub password: String,
+    
+    #[validate(must_match(other = "password", message = "Passwords do not match"))]
+    pub confirm_password: String,
+}
+```
+
+Axum sẽ ưu tiên gọi middleware và check trait `Validate` ngay khi parse JSON. Nếu người dùng nhập sai format email, chuỗi quá dài hay hai dòng password không giống nhau, server sẽ từ chối request và trả về lỗi `400 Bad Request` trước cả khi thực hiện business logic bên dưới.
+
+### Xử lý Logic Nghiệp Vụ tại vòng trong (Service)
+
+Các logic nghiệp vụ được cài đặt tại `core/src/service` mà không liên quan đến lớp HTTP và Database. Ví dụ như thao tác Checkout. Bài toán lúc này như sau: khi Client gửi yêu cầu Checkout, sau khi tạo đơn hàng (Order) thành công, ta lập tức phải xoá sạch giỏ hàng (Cart lưu ở Redis) của họ. Nhưng điều gì sẽ xảy ra nếu lệnh xoá Redis bị timeout hoặc mạng ở server gặp trục trặc? 
+
+Mình cài đặt file `crates/core/src/service/checkout_service.rs`:
+
+```rust
+// crates/core/src/service/checkout_service.rs
+
+impl CheckoutService {
+    pub async fn checkout(&self, user_id: i64) -> Result<order::Model, Error> {
+        let cart = self.cart_service.get_cart(user_id).await?;
+
+        if cart.items.is_empty() {
+            return Err(Error::bad_request("Cart is empty".to_string()));
+        }
+
+        // Tạo Order từ danh sách sản phẩm trong giỏ, insert xuống Postgres!
+        let order = self.checkout_repo.create_order(user_id, cart.items).await?;
+
+        // Chú ý: Cố gắng xoá giỏ hàng ở Redis sau khi tạo đơn thành công (best-effort)
+        // Không truyền lỗi ra ngoài để tránh việc Client bắt được lỗi, tưởng chưa đặt hàng xong
+        // và bấm "thanh toán" một lần nữa -> sinh ra một đơn hàng ảo (Duplicate order).
+        if let Err(e) = self.cart_service.clear_cart(user_id).await {
+            tracing::warn!(
+                "Failed to clear cart for user {} after creating order {}: {:?}",
+                user_id, order.id, e
+            );
+        }
+
+        Ok(order)
+    }
+}
+```
+
+Đoạn mã "best-effort clear cart" trên giải quyết một **edge case** nguy hiểm. Bằng cách dùng lệnh `if let Err(e)`, hệ thống bắt được exception của hàm dọn dẹp và chỉ cảnh báo ra màn hình (`tracing::warn!`). Hành động này giúp luồng xử lý không bị đứt gãy, hệ thống vẫn trả HTTP 201 cho đơn hàng về phía Client, hy sinh một khoảng RAM ở Redis để ưu tiên việc bảo vệ tính duy nhất của đơn đặt hàng (tránh Duplicate order) - một thứ tối kỵ trong ngành E-commerce.
 
 #### VI. Thành phần 5: Nghệ thuật Xử lý Lỗi (Error Handling)
 
