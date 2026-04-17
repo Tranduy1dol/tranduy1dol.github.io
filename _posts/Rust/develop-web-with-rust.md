@@ -179,7 +179,7 @@ Trong một dòng khai báo parameter, Axum tự động thực hiện:
 
 Thứ tự extract rất quan trọng: Axum xử lý từ trái qua phải. Nếu `JwtAuth` thất bại, `Json` sẽ không được gọi. Điều này tạo thành một "pipeline guard" tự nhiên.
 
-#### Custom Extractor: JwtAuth
+### Custom Extractor: JwtAuth
 
 Để tạo extractor riêng, mình implement trait `FromRequestParts` cho struct `JwtAuth`:
 
