@@ -71,7 +71,7 @@ Mô hình này giải thích cách đám đông đưa ra quyết định tham gi
 - Người có ngưỡng 0% là "kẻ chủ mưu" (instigators), họ sẽ hành động dù không có ai tham gia.
 - Người có ngưỡng 90% là người cực kỳ bảo thủ, chỉ làm khi gần như tất cả những người khác đều đã làm.
 
-Khám phá vĩ đại nhất của mô hình này là **"Cái đuôi vẫy con chó" (The tail wags the dog)**: Kết quả của một hành vi tập thể phụ thuộc vào sự phân bổ của các ngưỡng **(variance/distribution)** nhiều hơn là giá trị trung bình của các ngưỡng. Ví dụ: 
+Khám phá vĩ đại nhất của mô hình này là **"Cái đuôi vẫy con chó" (The tail wags the dog)**: Kết quả của một hành vi tập thể phụ thuộc vào sự phân bổ của các ngưỡng **(variance/distribution)** nhiều hơn là giá trị trung bình của các ngưỡng. Ví dụ:
 
 - Một nhóm 5 người có ngưỡng lần lượt là $1,1,2,2,2$. Dù trung bình ngưỡng thấp, không ai sẽ hành động khi không có "kẻ chủ mưu" (ngưỡng bằng 0).
 - Nhóm 5 người có ngưỡng lần lượt là $0,1,2,3,4$ có trung bình ngưỡng cao hơn, nhưng lại tạo ra hiệu ứng domino: người 0 hành động, kéo theo người 1, kéo theo người 2, ... Sự đa dạng ở phần đuôi phân bố (những người có ngưỡng cực thấp) quyết định sự bùng nổ của hệ thống.
@@ -87,6 +87,6 @@ Bên cạnh những yếu tố hiển nhiên (buổi diễn hay, ngưỡng khán
 
 - **Sức mạnh của nhiễu/đa dạng (More variation/diversity)**: Nếu chất lượng buổi diễn ở mức trung bình (không đủ để khiến tất cả tự động đứng lên), việc tăng sự đa dạng hoặc sai số trong cảm nhận của khán giả sẽ *làm tăng khả năng vỗ tay tán thưởng*. Lý do là sự đa dạng sẽ tạo ra một nhóm khán giả nghĩ rằng "buổi diễn cực kỳ xuất sắc" (phần đuôi của phân bố). Họ sẽ đứng lên trước, và áp lực từ số lượng này sẽ kéo theo toàn bộ những người còn lại.
 - **Cấu trúc không gian và Mạng lưới xã hội (Spatial and Network Effects)**: Vị trí và nhóm xã hội ảnh hưởng nghiêm trọng đến điểm bùng phát:
-	- *Người nổi tiếng (Celebrities)* ngồi hàng ghế đầu không nhìn thấy ai cả, không bị ai tác động, nhưng lại được toàn bộ khán giả ngồi phía sau nhìn thấy và bắt chước.
-	- *Học giả (Academics)* ngồi hàng ghế cuối quan sát toàn bộ hội trường, thu thập thông tin tốt nhất, nhưng không ai nhìn thấy họ nên họ không có sức ảnh hưởng lên hệ thống.
-	- *Nhóm khán giả (Dates/Groups)*: Con người hiếm khi đi xem kịch một mình. Nếu bạn đi cùng người thân, chỉ cần một người trong nhóm đứng, người kia sẽ đứng lên theo ngay lập tức. Điều này tự động giảm rào cản hành động cục bộ, khuếch đại nhanh chóng tỷ lệ người đứng và kích hoạt điểm bùng phát cho toàn bộ hội trường.
+ 	- *Người nổi tiếng (Celebrities)* ngồi hàng ghế đầu không nhìn thấy ai cả, không bị ai tác động, nhưng lại được toàn bộ khán giả ngồi phía sau nhìn thấy và bắt chước.
+ 	- *Học giả (Academics)* ngồi hàng ghế cuối quan sát toàn bộ hội trường, thu thập thông tin tốt nhất, nhưng không ai nhìn thấy họ nên họ không có sức ảnh hưởng lên hệ thống.
+ 	- *Nhóm khán giả (Dates/Groups)*: Con người hiếm khi đi xem kịch một mình. Nếu bạn đi cùng người thân, chỉ cần một người trong nhóm đứng, người kia sẽ đứng lên theo ngay lập tức. Điều này tự động giảm rào cản hành động cục bộ, khuếch đại nhanh chóng tỷ lệ người đứng và kích hoạt điểm bùng phát cho toàn bộ hội trường.

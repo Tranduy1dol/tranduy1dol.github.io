@@ -42,6 +42,7 @@ Mô hình phân loại là dạng mô hình dự đoán cơ bản nhất, trong 
 - **$R^2$**: Là tỷ lệ phương sai của dữ liệu đã được mô hình giải thích. Công thức là $R^2$ = Phương sai được giải thích / Tổng phương sai.
 
 Ví dụ, nếu bạn có một danh sách các loại thực phẩm với lượng calo dao động rất lớn, phương sai tổng sẽ rất cao. Nhưng nếu bạn phân loại chúng thành "Trái cây" và "Đồ tráng miệng" (bánh, kẹo), bạn sẽ thấy trái cây có lượng calo trung bình thấp hơn và đồ tráng miệng cao hơn. Bằng cách phân loại này, bạn có thể giải thích được phần lớn sự biến thiên của calo trong tập dữ liệu. Nếu $R^2$ càng gần 1 (hoặc 100%), mô hình phân loại càng xuất sắc; nếu gần 0, cách phân loại đó không có giá trị. Tuy nhiên, cần lưu ý nguyên tắc: Tương quan không đồng nghĩa với quan hệ nhân quả (Correlation is not causation).
+
 ## Mô hình Tuyến tính (Linear Models)
 
 Mô hình tuyến tính nâng cao hơn một bước so với mô hình phân loại, biểu diễn dạng toán học cơ bản nhất mà chúng ta học từ cấp 2: $y=mx+b$. Trong đó, $y$ (biến phụ thuộc) thay đổi dưới tác động của $x$ (biến độc lập). Mô hình này giúp chúng ta đánh giá hai yếu tố cực kỳ quan trọng đối với dữ liệu:

@@ -25,18 +25,21 @@ A minimalist, editorial-style personal website and blog built with [Next.js](htt
 
 ## Getting Started
 
-1.  **Clone the repository**:
+1. **Clone the repository**:
+
     ```bash
     git clone https://github.com/tranduy1dol/tranduy1dol.github.io.git
     cd tranduy1dol.github.io
     ```
 
-2.  **Install dependencies**:
+2. **Install dependencies**:
+
     ```bash
     npm install
     ```
 
-3.  **Run development server**:
+3. **Run development server**:
+
     ```bash
     npm run dev
     ```
