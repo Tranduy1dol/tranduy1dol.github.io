@@ -77,7 +77,7 @@ Có 3 điều kiện để cấu thành hàm Lyapunov cho bất kỳ hệ thốn
 2. Di chuyển theo một hướng (Directionality): Ở mỗi bước thời gian, nếu hệ thống chưa ở trạng thái cân bằng, giá trị của nó bắt buộc phải tiến gần về giới hạn (luôn giảm hoặc luôn tăng).
 3. Mức thay đổi tối thiểu (Minimum Step): Mức tăng/giảm ở mỗi bước phải ít nhất bằng một hằng số $k>0$. Điều này giúp hệ thống tránh khỏi "Nghịch lý Zeno". Và bằng cách biết được khoảng cách đến giới hạn và mức độ thay đổi tối thiểu, ta có thể tính được số bước tối đa hệ thống cần để hội tụ.
 
-###  Hạn chế
+### Hạn chế
 
 Dù hàm Lyapunov khẳng định hệ thống sẽ hội tụ ở trạng thái cân bằng, nó vẫn có hai hạn chế đáng lưu ý:
 
