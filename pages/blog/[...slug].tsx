@@ -294,9 +294,9 @@ const Post: NextPage<PostProps> = ({ postData }) => {
                                                     href={`#${heading.slug}`}
                                                     className="text-sm no-underline block hover:translate-x-1 transition-transform"
                                                     style={{ color: 'rgb(var(--color-text-muted))' }}
-                                                >
-                                                    {heading.text}
-                                                </a>
+                                                    dangerouslySetInnerHTML={{ __html: heading.htmlText || heading.text }}
+                                                />
+
                                             </li>
                                         ))}
                                     </ul>

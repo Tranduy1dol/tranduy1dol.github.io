@@ -11,12 +11,14 @@ import rehypeSlug from 'rehype-slug';
 import rehypeStringify from 'rehype-stringify';
 import rehypeHighlight from 'rehype-highlight';
 import GithubSlugger from 'github-slugger';
+import katex from 'katex';
 
 
 const postsDirectory = path.join(process.cwd(), '_posts');
 
 export type Heading = {
     text: string;
+    htmlText: string;
     slug: string;
     level: number;
 };
@@ -77,7 +79,15 @@ function extractHeadings(content: string): Heading[] {
         const text = match[2].trim();
         const slug = slugger.slug(text);
 
-        headings.push({ text, slug, level });
+        const htmlText = text.replace(/\$(.*?)\$/g, (m, math) => {
+            try {
+                return katex.renderToString(math, { throwOnError: false });
+            } catch {
+                return m;
+            }
+        });
+
+        headings.push({ text, htmlText, slug, level });
     }
 
     return headings;
