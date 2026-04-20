@@ -6,7 +6,7 @@ category: CODING
 ---
 ## Giới thiệu
 
-Mình tiếp xúc với Rust đến nay cũng là hai năm rồi. Cách tiếp cận Rust của mình như thế này: xem người khác code như thế nào hoặc đọc sách, code theo, điều chỉnh lại thành ý tưởng của mình. Dù cách này khá hiệu quả thời gian đầu, mình không bị ngợp khi tiếp xúc code mới. Nhưng về lâu dài càng, mình sẽ bị tụt lại dần vì không chịu tìm hiểu các khái niệm, thư viện cũng như các lý thuyết.
+Mình tiếp xúc với Rust đến nay cũng là hai năm rồi. Cách tiếp cận Rust của mình như thế này: xem người khác code như thế nào hoặc đọc sách, code theo, điều chỉnh lại thành ý tưởng của mình. Dù cách này khá hiệu quả thời gian đầu, mình không bị ngợp khi tiếp xúc code mới. Nhưng về lâu dài, mình sẽ bị tụt lại dần vì không chịu tìm hiểu các khái niệm, thư viện cũng như các lý thuyết.
 
 Sau khi nhận được feedback từ một vài người phỏng vấn, mình nhận ra đa số các vấn đề họ hỏi, mình đã đều tiếp xúc khi code, vấn đề của mình là không thể nhớ cách dùng, cách hoạt động của các khái niệm, công cụ đó.
 
@@ -443,7 +443,7 @@ impl CheckoutService {
 
 ## Xử lý Lỗi (Error Handling)
 
-Trong Rust web, việc lạm dụng `.unwrap()` là một điều tối kỵ, vì nó có thể làm toàn bộ server bị crash (panic) khi bất ngờ gặp lỗi. Thay vào đó, chúng ta phải bắt và xử lý lỗi triệt để thông qua kiểu `Result<T, E>`. Tuy nhiên, ứng dụng mình đang làm có nhiều thành phần có thể sinh ra lỗi (lỗi validate user input, hay lỗi truy vấn SQL từ SeaORM). Để có thể gom và thống nhất các loại lỗi về một mối và và trả về cho Client bằng JSON và HTTP Status Code thì làm thế nào?
+Trong Rust web, việc lạm dụng `.unwrap()` là một điều tối kỵ, vì nó có thể làm toàn bộ server bị crash (panic) khi bất ngờ gặp lỗi. Thay vào đó, chúng ta phải bắt và xử lý lỗi triệt để thông qua kiểu `Result<T, E>`. Tuy nhiên, ứng dụng mình đang làm có nhiều thành phần có thể sinh ra lỗi (lỗi validate user input, hay lỗi truy vấn SQL từ SeaORM). Để có thể thống nhất các loại lỗi về một mối và và trả về cho Client bằng JSON và HTTP Status Code thì làm thế nào?
 
 Tại tầng `core`, mình thiết kế file `crates/core/src/error.rs` và dùng crate `thiserror` để định nghĩa một Enum tập hợp toàn bộ các lỗi có thể xảy ra:
 
@@ -592,6 +592,6 @@ Bất kì dòng code nào format không đúng, bị clippy cảnh bảo hoặc 
 
 ## Kết luận
 
-Nhin chung, viết backend bằng Rust chậm hơn so với Node.js hay Python, vì mình cần xây dựng các thành phần từ đầu. Đổi lại, kết quả là mình có một hệ thống khá an toàn và hiệu suất cao. Ngoài ra, việc thiết kế kiến trúc ban đầu và follow theo kiến trúc đó đến khi hoàn thiện rất quan trọng, có thể tránh việc xóa đi viết lại code chỉ vì framework không hợp lý hoặc kiến trúc có lỗ hổng trong quá trình phát triển.
+Nhìn chung, viết backend bằng Rust chậm hơn so với Node.js hay Python, vì mình cần xây dựng các thành phần từ đầu. Đổi lại, kết quả là mình có một hệ thống khá an toàn và hiệu suất cao. Ngoài ra, việc thiết kế kiến trúc ban đầu và follow theo kiến trúc đó đến khi hoàn thiện rất quan trọng, có thể tránh việc xóa đi viết lại code chỉ vì framework không hợp lý hoặc kiến trúc có lỗ hổng trong quá trình phát triển.
 
 Đây là [github](https://github.com/Tranduy1dol/shopping-cart) của dự án. Mọi người có thể thoải mái thêm issue nếu có vấn đề hoặc contribute nếu muốn. Cảm ơn.
