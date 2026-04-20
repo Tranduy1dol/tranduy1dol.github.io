@@ -563,7 +563,6 @@ async fn test_checkout_success() {
 Ngoài ra, mình viết thêm một CI pipeline để đảm bảo chất lượng code trong `.github/workflows/ci.yml` để tự động kiểm tra code, chạy test khi push code/merge pull request vào nhánh `main`:
 
 ```yaml
-# .github/workflows/ci.yml
 name: Rust CI
 
 on:
