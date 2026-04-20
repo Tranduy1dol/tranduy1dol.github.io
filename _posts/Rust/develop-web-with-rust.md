@@ -560,8 +560,6 @@ async fn test_checkout_success() {
 }
 ```
 
-Thay vì phụ thuộc vào sự tự giác của từng người trong team để chạy lệnh kiểm tra, mình uỷ thác hoàn toàn cho con bot của Github làm "Giám đốc chất lượng (QA)". Trong file `.github/workflows/ci.yml`, mình cấu hình CI Pipeline để chặn đứng các dòng code lỗi từ trứng nước:
-
 Ngoài ra, mình viết thêm một CI pipeline để đảm bảo chất lượng code trong `.github/workflows/ci.yml` để tự động kiểm tra code, chạy test khi push code/merge pull request vào nhánh `main`:
 
 ```yaml
