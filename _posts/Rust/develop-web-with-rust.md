@@ -441,30 +441,160 @@ impl CheckoutService {
 
 Đoạn mã "best-effort clear cart" trên giải quyết một **edge case** nguy hiểm. Bằng cách dùng lệnh `if let Err(e)`, hệ thống bắt được exception của hàm dọn dẹp và chỉ cảnh báo ra màn hình (`tracing::warn!`). Hành động này giúp luồng xử lý không bị đứt gãy, hệ thống vẫn trả HTTP 201 cho đơn hàng về phía Client, hy sinh một khoảng RAM ở Redis để ưu tiên việc bảo vệ tính duy nhất của đơn đặt hàng (tránh Duplicate order) - một thứ tối kỵ trong ngành E-commerce.
 
-#### VI. Thành phần 5: Nghệ thuật Xử lý Lỗi (Error Handling)
+## Xử lý Lỗi (Error Handling)
 
-- **Vấn đề:** Ứng dụng Rust không nên `unwrap()` và crash (panic). Cần xử lý lỗi triệt để, log lại lỗi chi tiết cho backend dev (chẩn đoán), nhưng chỉ trả về HTTP status code chuẩn mực (400, 401, 500) và câu thông báo an toàn cho frontend.
+Trong Rust web, việc lạm dụng `.unwrap()` là một điều tối kỵ, vì nó có thể làm toàn bộ server bị crash (panic) khi bất ngờ gặp lỗi. Thay vào đó, chúng ta phải bắt và xử lý lỗi triệt để thông qua kiểu `Result<T, E>`. Tuy nhiên, ứng dụng mình đang làm có nhiều thành phần có thể sinh ra lỗi (lỗi validate user input, hay lỗi truy vấn SQL từ SeaORM). Để có thể gom và thống nhất các loại lỗi về một mối và và trả về cho Client bằng JSON và HTTP Status Code thì làm thế nào?
 
-- **Cách tôi giải quyết:**
+Tại tầng `core`, mình thiết kế file `crates/core/src/error.rs` và dùng crate `thiserror` để định nghĩa một Enum tập hợp toàn bộ các lỗi có thể xảy ra:
 
-  - Sử dụng `thiserror` định nghĩa các Enum lỗi ở tầng `core`.
+```rust
+// crates/core/src/error.rs
 
-  - Tận dụng sức mạnh của trait `IntoResponse` trong Axum để tự động "biến hình" từ một lỗi nội bộ (như Lỗi SQL) thành một JSON Error Response có cấu trúc thống nhất.
+use axum::{http::StatusCode, response::{IntoResponse, Response}, Json};
+use sea_orm::DbErr;
+use serde_json::json;
 
-#### VII. Thành phần 6: Độ tin cậy (Testing & CI/CD)
+#[derive(thiserror::Error, Debug)]
+pub enum Error {
+    #[error("Internal Server Error")]
+    Internal(#[from] Internal),
 
-- **Vấn đề:** Làm sao để tự tin khi refactor code? Làm sao để đảm bảo code đẩy lên Github luôn build được?
+    #[error("Not Found: {0}")]
+    NotFound(#[from] NotFound),
 
-- **Cách tôi giải quyết:**
+    // Sử dụng #[from] để tự động convert lỗi của thư viện bên ngoài thành lỗi của nội bộ
+    #[error("Database Error: {0}")]
+    Database(#[from] DbErr),
 
-  - Viết **Integration Tests** (như trong `crates/app/tests/`) để kiểm thử dòng chảy (flow) từ API gọi xuống DB giả lập.
+    #[error("Validation Error: {0}")]
+    Validation(#[from] validator::ValidationErrors),
+}
 
-  - Sử dụng **GitHub Actions** (chỉ ra file `.github/workflows/ci.yml`) để tự động chạy Format, Lint (Clippy) và Test mỗi khi có commit mới.
+#[derive(thiserror::Error, Debug)]
+#[error("Not found: {message}")]
+pub struct NotFound {
+    pub message: String,
+}
+```
 
-#### VIII. Kết luận
+Từ nay tại các Endpoint, thay vì dùng `map_err` liên tục để ép kiểu lỗi, việc kết hợp `thiserror` và thẻ `#[from]` cho phép mình dùng `?` để Rust tự động ép kiểu của thư viện ngoài thành lỗi được định nghĩa trong Enum `Error`.
 
-- **Nhìn lại hành trình:** Viết backend Rust đòi hỏi phải setup nhiều mảnh ghép lúc ban đầu (boilerplate) hơn so với các ngôn ngữ như Node.js/Python, nhưng bù lại, hệ thống cực kỳ an toàn, rõ ràng và hiệu suất cao.
+Tiếp theo, mình cài đặt trait `IntoResponse` của Axum để tự động chuyển lỗi trong Enum `Error` thành dạng JSON và trả về cho client:
 
-- **Lời khuyên:** Khuyên người mới đọc tài liệu (như các sách về Rust Web), chia nhỏ bài toán, sử dụng Clean Architecture.
+```rust
+// crates/core/src/error.rs
 
-- **Kêu gọi (Call to action):** Cung cấp link Github dự án để mọi người tham khảo và đóng góp.
+impl Error {
+    // Phép biến hình lỗi nội bộ sang chuẩn HTTP Status Code
+    fn get_codes(&self) -> (StatusCode, u16) {
+        match self {
+            Error::NotFound(_) => (StatusCode::NOT_FOUND, 10004),
+            Error::Database(_) => (StatusCode::INTERNAL_SERVER_ERROR, 10006),
+            Error::Validation(_) => (StatusCode::BAD_REQUEST, 10008),
+            _ => (StatusCode::INTERNAL_SERVER_ERROR, 10001),
+        }
+    }
+}
+
+impl IntoResponse for Error {
+    fn into_response(self) -> Response {
+        let (status_code, _) = self.get_codes();
+        
+        // Trả về JSON chuẩn nhất quán cho mọi loại lỗi có thể xảy ra
+        let body = Json(json!({ 
+            "success": false, 
+            "message": self.to_string() 
+        }));
+
+        (status_code, body).into_response()
+    }
+}
+```
+
+Giờ đây ở các tầng Handler của web server, code được clean hơn:
+
+```rust
+pub async fn get_user_by_id(...) -> Result<Json<UserDto>, Error> {
+    let user = service.get_user(id).await?; // Dấu ? ngắn gọn và tinh tế
+    Ok(Json(user)) // Khi thành công
+}
+```
+
+Nếu hàm `get_user` phía Database trả về "Không tìm thấy phần tử", `?` sẽ tự trả ra lỗi `Error::NotFound`, HTTP Response `{ "success": false, "message": "Not found: id xyz" }` với status `404 Not Found` thông qua `into_reponse()`.
+
+## Testing & CI/CD
+
+Mặc dù Rust nổi tiếng vì trình biên dịch tĩnh siêu chặt chẽ ở giai đoạn Compile-time, nhưng nó vẫn không thể bảo vệ hệ thống khỏi những sai sót hổng logic nghiệp vụ (Business Logic). Nếu thiếu tests, refactor hoặc update dependences có thể mang lại rủi ro gặp lỗi. Hơn nữa, code đẩy lên Github có thể không đảm bảo chất lượng (format, hoặc performance) hoặc làm sập hệ thống khi deploy.
+
+Nhờ việc tuân thủ triệt để nguyên lý Dependency Inversion của Clean Architecture, toàn bộ các thành phần của `shopping-cart` đều giao tiếp với nhau qua các "cổng" Trait (Ports). Điều này giúp việc thiết kế các **Integration Test** dễ hơn, mình có thể dùng mock repository thay vì setup một database thật.
+
+Axum cung cấp `.oneshot()` để giả lập việc gọi HTTP. Mình dùng hàm này để gọi vào endpoint test của hệ thống mà không cần mở TCP chạy ngầm:
+
+```rust
+// crates/app/tests/checkout_test.rs
+
+use axum::http::{Method, Request, StatusCode};
+use tower::ServiceExt; // Nơi chứa hàm oneshot
+
+#[tokio::test]
+async fn test_checkout_success() {
+    // 1. Dựng một Mock AppState (Dữ liệu giả lập lữu đệm Ram)
+    let mock_state = AppState::new_mock(); 
+    
+    // 2. Load API Router của phiên bản test
+    let app = create_router(mock_state);
+
+    // 3. Giả lập một HTTP Request POST hoàn chỉnh gửi vào Endpoint
+    let request = Request::builder()
+        .method(Method::POST)
+        .uri("/api/v1/checkout")
+        .header("Authorization", "Bearer MOCK_TOKEN")
+        .body(Body::from(r#"{"cart_id": "cart_123"}"#))
+        .unwrap();
+
+    // 4. One-shot: Gửi luồng bay thẳng xuống Axum không vòng qua cổng mạng ảo HTTP
+    let response = app.oneshot(request).await.unwrap();
+
+    // 5. Kiểm định kết quả có đúng kỳ vọng không
+    assert_eq!(response.status(), StatusCode::CREATED);
+}
+```
+
+Thay vì phụ thuộc vào sự tự giác của từng người trong team để chạy lệnh kiểm tra, mình uỷ thác hoàn toàn cho con bot của Github làm "Giám đốc chất lượng (QA)". Trong file `.github/workflows/ci.yml`, mình cấu hình CI Pipeline để chặn đứng các dòng code lỗi từ trứng nước:
+
+Ngoài ra, mình viết thêm một CI pipeline để đảm bảo chất lượng code trong `.github/workflows/ci.yml` để tự động kiểm tra code, chạy test khi push code/merge pull request vào nhánh `main`:
+
+```yaml
+# .github/workflows/ci.yml
+name: Rust CI
+
+on:
+  push:
+    branches: [ "develop", "main" ]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Toolchain Rust
+        uses: dtolnay/rust-toolchain@stable
+      
+      - name: 1. Check Định dạng Code
+        run: cargo fmt --all -- --check
+        
+      - name: 2. Clippy Code Linter (Phát hiện Code dở và Dừng build ngay lập tức nếu có warning)
+        run: cargo clippy --all-targets --all-features -- -D warnings
+        
+      - name: 3. Chạy Integration Tests
+        run: cargo test --all-features
+```
+
+Bất kì dòng code nào format không đúng, bị clippy cảnh bảo hoặc chạy test fail, Github Action sẽ failed và không thể merge pull request.
+
+## Kết luận
+
+Nhin chung, viết backend bằng Rust chậm hơn so với Node.js hay Python, vì mình cần xây dựng các thành phần từ đầu. Đổi lại, kết quả là mình có một hệ thống khá an toàn và hiệu suất cao. Ngoài ra, việc thiết kế kiến trúc ban đầu và follow theo kiến trúc đó đến khi hoàn thiện rất quan trọng, có thể tránh việc xóa đi viết lại code chỉ vì framework không hợp lý hoặc kiến trúc có lỗ hổng trong quá trình phát triển.
+
+Đây là [github](https://github.com/Tranduy1dol/shopping-cart) của dự án. Mọi người có thể thoải mái thêm issue nếu có vấn đề hoặc contribute nếu muốn. Cảm ơn.
