@@ -12,7 +12,7 @@ Bài này sẽ trình bày cách mình triển khai hệ thống giao dịch nà
 
 ## Kiến trúc hệ thống
 
-Ở bài viết trước về [Shopping Cart](/blog/Rust/e-commerce-backend), mình đã trình bày chi tiết về **Clean Architecture** và cách nó giúp tách biệt rõ ràng các tầng trong một ứng dụng Web. Trong dự án Trading Engine này, mình vẫn giữ nguyên tắc đó ở cấp độ crate, nhưng điểm nhấn kiến trúc lần này nằm ở một pattern hoàn toàn khác biệt: **LMAX Disruptor**.
+Ở bài viết trước về [Shopping Cart](/_posts/Rust/e-commerce-backend), mình đã trình bày chi tiết về **Clean Architecture** và cách nó giúp tách biệt rõ ràng các tầng trong một ứng dụng Web. Trong dự án Trading Engine này, mình vẫn giữ nguyên tắc đó ở cấp độ crate, nhưng điểm nhấn kiến trúc lần này nằm ở một pattern hoàn toàn khác biệt: **LMAX Disruptor**.
 
 ### LMAX Disruptor
 
