@@ -1,7 +1,7 @@
 ---
 title: Mình làm thêm project HFT vì mình thất nghiệp
 date: 2026-04-21
-excerpt: Cách mình code thêm một trading system để đưa vào cv
+excerpt: Cách mình cài đặt một Trading System bằng Rust để đưa vào CV
 category: CODING
 ---
 ## Giới thiệu
