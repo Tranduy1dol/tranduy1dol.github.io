@@ -6,7 +6,7 @@ category: CODING
 ---
 ## Giới thiệu
 
-Với các hệ thống Web thông thường, mình thường làm CRUD, thiết kế Database Schema và làm HTTP Restful API. Nhưng để tận dụng khả năng của Rust là ngôn ngữ lập trình hiệu suất cao và an toàn, mình cần tìm kiếm các bài toán có thể tận dụng triệt để các ưu điểm đó. Hệ thống giao dịch là một trong những bài toán đó. Khác với Web, hệ thống giao dịch cần tốc độ xử lý vô cùng nhanh (micro-giây), và cần lưu dữ liệu trong RAM vì IO của ổ cứng chậm hơn tốc độ cần.
+Với các hệ thống Web thông thường, mình thường làm CRUD, thiết kế Database Schema và làm HTTP Restful API. Nhưng để tận dụng khả năng của Rust là ngôn ngữ lập trình hiệu suất cao và an toàn, mình tìm kiếm các bài toán có thể tận dụng triệt để các ưu điểm đó. Hệ thống giao dịch là một trong những bài toán đó. Khác với Web, hệ thống giao dịch cần tốc độ xử lý vô cùng nhanh (micro-giây), và cần lưu dữ liệu trong RAM vì I/O của ổ cứng chậm hơn tốc độ cần.
 
 Bài này sẽ trình bày cách mình triển khai hệ thống giao dịch này.
 
