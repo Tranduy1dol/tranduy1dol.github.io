@@ -54,7 +54,7 @@ RDB (Redis Database) hoạt động như chụp ảnh: cứ mỗi khoảng thờ
 
 **Config mặc định:**
 
-```
+```ini
 save 900 1      # snapshot nếu có ≥1 change trong 900 giây
 save 300 10     # snapshot nếu có ≥10 changes trong 300 giây
 save 60 10000   # snapshot nếu có ≥10000 changes trong 60 giây
@@ -94,11 +94,11 @@ WAL (Write-Ahead Log) - AOF có chung ý tưởng: ghi log trước, rebuild sta
 
 `everysec` là default và là lựa chọn phổ biến nhất — mất tối đa 1 giây data, đổi lại performance gần như không bị ảnh hưởng.
 
-**Vấn đề: file AOF phình to**
+### Vấn đề: file AOF phình to
 
 Mỗi operation đều được ghi, kể cả những thứ redundant:
 
-```
+```text
 SET cart:42 '{"items":[{"product_id":1,"quantity":1}]}'
 SET cart:42 '{"items":[{"product_id":1,"quantity":2}]}'
 SET cart:42 '{"items">[{"product_id":1,"quantity":3}]}'
@@ -115,7 +115,7 @@ Từ Redis 4.0, bạn có thể bật cả hai:
 
 Đây là config recommended cho production:
 
-```
+```ini
 appendonly yes
 aof-use-rdb-preamble yes
 ```
@@ -143,7 +143,7 @@ Cart đã có TTL 24 giờ — nó vốn là ephemeral data. Mất cart không p
 
 Nhưng nếu muốn an toàn hơn mà không sacrifice performance:
 
-```
+```ini
 appendonly yes
 appendfsync everysec
 ```

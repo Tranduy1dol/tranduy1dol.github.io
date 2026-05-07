@@ -90,7 +90,7 @@ Một page 8KB có thể chứa khoảng 100-200 keys (tùy kích thước key).
 
 ### Cấu trúc B-tree
 
-```
+```text
                     [30 | 60 | 90]              ← root node (1 page)
                    /    |     |    \
         [5|10|20]  [35|40|50]  [65|70|80]  [92|95|99]   ← internal nodes

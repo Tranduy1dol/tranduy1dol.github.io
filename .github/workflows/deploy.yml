@@ -2,16 +2,14 @@ name: Deploy Next.js site to Pages
 
 on:
   push:
-    branches: ["main"] # Trigger the action on push to the main branch
-  workflow_dispatch:   # Allow manual triggering from the Actions tab
+    branches: ["main"]
+  workflow_dispatch:
 
-# Set permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Allow only one concurrent deployment
 concurrency:
   group: "pages"
   cancel-in-progress: true
@@ -21,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4 # ✅ Updated
+        uses: actions/checkout@v4
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -36,9 +34,9 @@ jobs:
       - name: Build with Next.js
         run: npm run build
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3 # ✅ Updated & Corrected
+        uses: actions/upload-pages-artifact@v3
         with:
-          path: ./out # Next.js static export folder
+          path: ./out
 
   deploy:
     environment:
@@ -49,4 +47,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4 # ✅ Updated
+        uses: actions/deploy-pages@v4
