@@ -7,7 +7,7 @@ category: SYSTEMS
 
 ## Câu hỏi phỏng vấn tôi không trả lời được
 
-Người phỏng vấn hỏi mình: "Index trong PostgreSQL hoạt động thế nào?". 
+Người phỏng vấn hỏi mình: "Index trong PostgreSQL hoạt động thế nào?".
 
 Mình trả lời: "Nó giúp query nhanh hơn, giống như mục lục trong sách."
 
@@ -103,6 +103,7 @@ Một page 8KB có thể chứa khoảng 100-200 keys (tùy kích thước key).
 - **Leaf nodes:** chứa actual key + pointer đến row trong bảng
 
 Tìm `category_id = 42`:
+
 1. Đọc root → 42 nằm giữa 30 và 60 → đi vào child thứ 2
 2. Đọc internal node → tìm vị trí chính xác
 3. Đọc leaf node → lấy pointer đến row

@@ -7,6 +7,7 @@ Vừa hoàn thành khóa **Model Thinking** trên Coursera. Đã viết 7 bài b
 **Background kỹ thuật:** Rust, Go, C/C++. Các hệ thống đã làm: backend, HFT, search engine. Đang học và định hướng theo hướng **systems engineering**.
 
 **Mục tiêu:**
+
 - Giữ lại kiến thức cho bản thân
 - Positioning bản thân như engineer hiểu system design ở mức sâu — không chỉ biết code mà articulate được lý do đằng sau các quyết định kỹ thuật
 - Chia sẻ với developers khác
@@ -38,6 +39,7 @@ Cấu trúc đang đi theo kiểu *lecture notes*:
 > Mỗi bài là một **vấn đề kỹ thuật thực tế**. Lý thuyết xuất hiện để giải thích, không phải để được trình bày.
 
 **Công thức cho mỗi bài:**
+
 ```
 Vấn đề thực tế → Phân tích bằng mô hình → Trade-off → Quyết định → Bài học
 ```
@@ -69,6 +71,7 @@ Bài 1 đã có đủ nguyên liệu từ câu chuyện thực tế:
 **Angle:** *"Tôi build một activity logger, tưởng đơn giản, rồi nhận ra mình đang thiết kế một hệ thống có thể tự crash chính nó — và tại sao mọi distributed system đều có vấn đề này."*
 
 **Outline sơ bộ:**
+
 1. Bài toán ban đầu: log activity của user
 2. Quyết định đầu tiên: save thẳng vào DB → vấn đề gì?
 3. Giải pháp: producer-consumer pattern
