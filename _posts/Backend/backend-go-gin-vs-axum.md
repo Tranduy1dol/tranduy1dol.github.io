@@ -1,7 +1,7 @@
 ---
-title: "Backend Go với Gin — những gì mình học được khi so sánh với Axum"
+title: Backend Go với Gin — những gì mình học được khi so sánh với Axum
 date: 2026-05-10
-excerpt: Sau khi viết backend bằng Rust và Axum, mình build một project Go với Gin. Cùng bài toán, khác ngôn ngữ — và sự khác biệt thú vị hơn mình nghĩ.
+excerpt: Cùng một bài toán, nhưng Go (Gin) và Rust (Axum) có sự khác nhau rõ rệt.
 category: CODING
 ---
 ## Cùng bài toán, khác ngôn ngữ
