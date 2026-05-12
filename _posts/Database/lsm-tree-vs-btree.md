@@ -27,7 +27,7 @@ Client write
      │
      ▼
 ┌──────────┐
-│ MemTable │  ← sorted tree trong RAM (Red-Black tree hoặc Skip List)
+│ MemTable │  ← sorted tree trong RAM (thường là Skip List)
 └────┬─────┘
      │  (khi đầy, ~4MB)
      ▼
@@ -39,7 +39,7 @@ Client write
 Mỗi bước:
 
 1. **WAL**: ghi command vào append-only log trước — giống trading journal của mình. Nếu crash trước khi flush MemTable, replay WAL để khôi phục.
-2. **MemTable**: insert key vào sorted structure trong RAM. Write ở đây là O(log n) trong memory — nhanh hơn nhiều so với disk I/O.
+2. **MemTable**: insert key vào sorted structure trong RAM. Thường dùng Skip List thay vì Red-Black tree — vì Skip List cho phép concurrent writes dễ hơn (không cần rotation khi nhiều threads ghi đồng thời). Write ở đây là O(log n) trong memory — nhanh hơn nhiều so với disk I/O.
 3. **SSTable** (Sorted String Table): khi MemTable đầy, dump toàn bộ ra disk thành một file đã sorted. File này immutable — không bao giờ bị sửa sau khi tạo.
 
 Write vào LSM-tree = 1 sequential write (WAL) + 1 memory insert. Không có random I/O. Không có node split. Đó là lý do write nhanh hơn B-tree.
@@ -77,6 +77,8 @@ Worst case: key không tồn tại → phải tìm qua **tất cả** SSTables. 
 ### Bloom filter — tránh đọc thừa
 
 Bloom filter là probabilistic data structure: cho biết một key **chắc chắn không có** hoặc **có thể có** trong SSTable.
+
+Cơ chế: một mảng bit cố định + k hash functions. Insert key → hash k lần → bật k bits lên 1. Check key → hash k lần → nếu bất kỳ bit nào = 0 → chắc chắn không có. Nếu tất cả = 1 → có thể có (vì bits đó có thể do keys khác bật). False negative không thể xảy ra vì bits đã bật không tự tắt.
 
 ```text
 Bloom filter cho SSTable₂: "order_12345 chắc chắn không ở đây"
