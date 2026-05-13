@@ -4,7 +4,6 @@ date: 2026-05-12
 excerpt: B-tree tối ưu cho đọc, nhưng write-heavy workload thì sao? LSM-tree giải quyết bằng cách tách write path và read path hoàn toàn.
 category: SYSTEMS
 ---
-
 ## Tension cơ bản
 
 [Bài trước](../Database/postgresql-index-btree) mình nói B-tree giảm disk I/O từ 20 lần xuống 3 lần cho mỗi read. Nhưng cuối bài cũng đã nói mặt trái: mỗi index thêm overhead cho write — node split, cập nhật nhiều pages, random I/O rải rác trên disk.
