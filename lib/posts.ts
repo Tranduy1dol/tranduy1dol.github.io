@@ -23,6 +23,11 @@ export type Heading = {
     level: number;
 };
 
+export type RelatedPost = {
+    title: string;
+    slug: string[];
+};
+
 export type PostData = {
     id: string;
     slug: string[];
@@ -34,6 +39,7 @@ export type PostData = {
     readTime?: string;
     contentHtml?: string;
     headings?: Heading[];
+    relatedPosts?: RelatedPost[];
 };
 
 export type TagCount = {
@@ -214,6 +220,24 @@ function findPostFileBySlug(slug: string[]): string | null {
     return found ? found.filePath : null;
 }
 
+export function getRelatedPosts(slugStrings: string[]): RelatedPost[] {
+    const allFiles = getAllMarkdownFiles(postsDirectory);
+
+    return slugStrings
+        .map((slugStr) => {
+            const targetSlug = slugStr.split('/').map(slugify);
+            const found = allFiles.find(({ filePath }) => {
+                const fileSlug = buildSlug(filePath);
+                return fileSlug.length === targetSlug.length && fileSlug.every((s, i) => s === targetSlug[i]);
+            });
+            if (!found) return null;
+            const content = fs.readFileSync(found.filePath, 'utf8');
+            const { data } = matter(content);
+            return { title: data.title as string, slug: targetSlug };
+        })
+        .filter((p): p is RelatedPost => p !== null);
+}
+
 // Gets the full data for a single post, including HTML content
 export async function getPostData(slug: string[]): Promise<PostData> {
     const filePath = findPostFileBySlug(slug);
@@ -275,6 +299,15 @@ export async function getPostData(slug: string[]): Promise<PostData> {
         ? dateValue.toISOString().split('T')[0]
         : dateValue;
 
+    // Resolve related posts from frontmatter
+    const relatedPosts = matterResult.data.relatedPosts
+        ? getRelatedPosts(
+            Array.isArray(matterResult.data.relatedPosts)
+                ? matterResult.data.relatedPosts
+                : [matterResult.data.relatedPosts]
+        )
+        : undefined;
+
     // Combine the data with the id and contentHtml
     return {
         id,
@@ -283,6 +316,7 @@ export async function getPostData(slug: string[]): Promise<PostData> {
         readTime,
         headings,
         tags,
+        relatedPosts,
         date: dateStr as string,
         title: matterResult.data.title as string,
         excerpt: matterResult.data.excerpt as string | undefined,

@@ -3,6 +3,9 @@ title: "LSM-tree vs B-tree: write nhanh hay read nhanh — chọn một"
 date: 2026-05-12
 excerpt: B-tree tối ưu cho đọc, nhưng write-heavy workload thì sao? LSM-tree giải quyết bằng cách tách write path và read path hoàn toàn.
 category: SYSTEMS
+relatedPosts:
+  - Database/postgresql-index-btree
+  - Database/wal-trading-engine
 ---
 ## Tension cơ bản
 

@@ -241,23 +241,27 @@ const Post: NextPage<PostProps> = ({ postData }) => {
                         </div>
 
                         {/* Related Reading */}
-                        <div
-                            className="border-t-2 mt-12 pt-8"
-                            style={{ borderColor: 'rgb(var(--color-border))' }}
-                        >
-                            <h4 className="mb-4">Related Reading</h4>
-                            <ul className="space-y-2">
-                                <li>
-                                    <Link
-                                        href="/blog"
-                                        style={{ color: 'rgb(var(--color-text-muted))' }}
-                                        className="hover:opacity-70 transition-opacity"
-                                    >
-                                        View all posts
-                                    </Link>
-                                </li>
-                            </ul>
-                        </div>
+                        {postData.relatedPosts && postData.relatedPosts.length > 0 && (
+                            <div
+                                className="border-t-2 mt-12 pt-8"
+                                style={{ borderColor: 'rgb(var(--color-border))' }}
+                            >
+                                <h4 className="mb-4">Related Reading</h4>
+                                <ul className="space-y-2">
+                                    {postData.relatedPosts.map((related) => (
+                                        <li key={related.slug.join('/')}>
+                                            <Link
+                                                href={`/blog/${related.slug.join('/')}`}
+                                                style={{ color: 'rgb(var(--color-text-muted))' }}
+                                                className="hover:opacity-70 transition-opacity"
+                                            >
+                                                {related.title}
+                                            </Link>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
 
                         {/* Comments Section — powered by Giscus (GitHub Discussions) */}
                         <div
