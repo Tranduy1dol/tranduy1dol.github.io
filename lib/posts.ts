@@ -306,7 +306,7 @@ export async function getPostData(slug: string[]): Promise<PostData> {
                 ? matterResult.data.relatedPosts
                 : [matterResult.data.relatedPosts]
         )
-        : undefined;
+        : [];
 
     // Combine the data with the id and contentHtml
     return {
