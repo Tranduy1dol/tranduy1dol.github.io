@@ -135,6 +135,24 @@ export function getSortedDraftsData(): PostData[] {
     });
 }
 
+// Get all draft tags with counts
+export function getAllDraftTags(): Array<{ name: string; count: number }> {
+    const allDrafts = getSortedDraftsData();
+    const tagCounts: Record<string, number> = {};
+
+    for (const draft of allDrafts) {
+        if (draft.tags) {
+            for (const tag of draft.tags) {
+                tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+            }
+        }
+    }
+
+    return Object.entries(tagCounts)
+        .map(([name, count]) => ({ name, count }))
+        .sort((a, b) => b.count - a.count);
+}
+
 // Gets all possible slugs for dynamic routing
 export function getAllDraftSlugs() {
     const allFiles = getAllMarkdownFiles(draftsDirectory);
