@@ -6,7 +6,7 @@ category: CODING
 ---
 ## Cùng bài toán, khác ngôn ngữ
 
-Bài về [shopping-cart](../Backend/e-commerce-backend) mình dùng Rust + Axum. Project lần này là **kotoba-press-core** — backend cho app học tiếng Nhật, có từ điển JMdict, test JLPT, và spaced repetition flashcard. Mình dùng Go + Gin.
+Bài về [shopping-cart](../Backend/e-commerce-backend) mình dùng Rust + Axum. Project lần này là **kotoba-press-core** — backend cho app học tiếng Nhật, có từ điển, test JLPT, và spaced repetition flashcard. Mình dùng Go + Gin.
 
 Kiến trúc vẫn là Clean Architecture, vẫn có repository pattern, vẫn inject dependency từ `main`. Phần đó không có gì mới để nói. Cái thú vị là cách Gin và Axum giải quyết cùng một vấn đề theo hai hướng khác nhau.
 

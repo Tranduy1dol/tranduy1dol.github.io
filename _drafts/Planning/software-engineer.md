@@ -5,8 +5,6 @@ excerpt: Learning plan và roadmap đọc sách cho Systems Engineering
 category: PLANNING
 ---
 
-# Kế hoạch học tập & viết blog — Software Engineering
-
 ## Bối cảnh & mục tiêu
 
 **Profile:** Rust Developer tại Sotatek, năm 3 UET Hanoi. Đã làm trading engine (io_uring, WAL, zero-copy), e-commerce microservice, blockchain/ZKP.
