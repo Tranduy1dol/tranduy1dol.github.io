@@ -44,5 +44,3 @@ next-env.d.ts
 # Obsidian
 .obsidian/
 .trash/
-
-context/

@@ -185,7 +185,11 @@ const Layout = ({ children }: LayoutProps) => {
                         style={{ borderColor: 'rgb(var(--color-text-muted))' }}
                     >
                         <p className="text-xs" style={{ color: 'rgb(var(--color-text-muted))' }}>
-                            © {new Date().getFullYear()} tranduy1dol. All rights reserved.
+                            <Link
+                                href="/drafts"
+                                className="no-underline"
+                                style={{ color: 'inherit', cursor: 'text' }}
+                            >©</Link> {new Date().getFullYear()} tranduy1dol. All rights reserved.
                         </p>
                         <p className="text-xs" style={{ color: 'rgb(var(--color-text-muted))' }}>
                             Designed with intention and care.
