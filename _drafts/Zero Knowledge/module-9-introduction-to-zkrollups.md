@@ -1,0 +1,90 @@
+---
+title: "Module 9: Introduction to zkRollups"
+date: 2026-05-26
+excerpt: "Tìm hiểu về giải pháp mở rộng quy mô Layer 2 zkRollups, cách thức gộp và xác thực giao dịch trên chuỗi khối."
+category: LEARNING
+---
+
+- Rollups: a way to scale blockchain. So we need it because the amount of transactions is increasing. zk Rollups is controlled by smart contracts.
+- How do zk Rollups interact with Ethereum?
+    
+    ⇒ A zkRollups chain is an off-chain protocol
+    
+    - Core architecture:
+        - On-chain contracts: As mentioned, the ZK-rollup protocol is controlled by smart contracts running on Ethereum. This includes the main contract which stores roll-up blocks, tracks deposits, and monitors state updates. Another on-chain contract (the verifier contract) verifies zero-knowledge proofs submitted by block producers. Thus, Ethereum serves as the base layer or "layer 1" for the ZK rollup.
+        - Off-chain virtual machine (VM): This off-chain VM is the execution environment for transactions on the ZK-rollup and serves as the secondary layer or "layer 2" for the ZK-rollup protocol. Validity proofs verified on Ethereum Mainnet guarantee the correctness of state transitions in the off-chain VM.
+    - Data **availability**:
+        - **State data publication:** ZK-rollups make state data available on Ethereum for transparency and trustless verification.
+        - **Minimal transaction data:** They rely on validity proofs for authenticity, reducing on-chain data needs.
+        - **Importance of on-chain storage:**
+            - **Permissionless verification:** Ensures anyone can verify the L2 chain's state, preventing censorship or freezing.
+            - **User interaction:** Enables users to query balances, initiate withdrawals, and interact with the rollup.
+        - **Calldata accessibility:** State data is accessible to all Ethereum participants as calldata.
+    - **Transaction finality**
+        - **L1 settlement:** ZK-rollup transactions are finalized only after Ethereum's L1 contract verifies validity proofs.
+        - **Security against malicious operators:** This mandatory L1 approval safeguards rollup funds and integrity.
+        - **Irreversibility:** Once finalized on L1, user operations cannot be reversed, guaranteeing transaction permanence.
+    - **Censorship resistance**
+        - **Supernode efficiency and risk:** ZK-rollups typically employ a centralized "supernode" for transaction execution and batch submission, but this concentration of power creates the potential for censorship.
+        - **Direct L1 transaction submission:** To counter this risk, ZK-rollups offer a safeguard mechanism for users to submit transactions directly to the L1 contract, circumventing potential censorship by the operator.
+        - **Forced exit capability:** This feature allows users to exit the ZK-rollup and withdraw their funds to Ethereum without requiring operator approval, ensuring user autonomy and control over their assets.
+- How do zk Rollups work?
+    - Transaction
+        - Transaction:
+            - **User transaction submission:** Users sign and submit transactions to L2 operators for inclusion in batches.
+            - **Sequencer model:**
+                - The centralized entity responsible for executing transactions, aggregating batches, and submitting to L1.
+                - Sole producer of L2 blocks and maintainer of the ZK-rollup contract.
+            - **Proof-of-stake model:**
+                - Decentralized approach involving a validator set.
+                - Validators stake funds to participate in block production.
+                - Stake size influences selection probability.
+                - Malicious behavior can result in stake slashing, ensuring validator integrity.
+        - Publish transaction:
+            - **Calldata:**
+                - A data area in smart contracts is used to pass function arguments.
+                - Resembles memory but isn't part of Ethereum's state.
+                - Persists in history logs for on-chain accessibility.
+                - Cost-effective due to its minimal impact on the state.
+            - **ZK-rollup usage:**
+                - Employs calldata to store compressed transaction data on-chain.
+                - Rollup operator adds new batches by calling contract functions with compressed data as arguments.
+            - **Cost reduction:**
+                - Calldata's efficiency contributes to lower rollup fees for users, as transaction data storage is a significant cost factor.
+    - State commitment
+        - **Merkle tree representation:** The ZK-rollup's state (accounts and balances) is stored in a Merkle tree.
+        - **Merkle root storage:** The cryptographic hash of the tree's root is held in the on-chain contract, enabling state tracking.
+        - **State transitions:**
+            - New transactions trigger state transitions.
+            - The operator computes a new state root and submits it to the contract.
+            - Upon proof verification, the new root becomes the canonical state root.
+        - **Batch roots:**
+            - The operator also creates a batch root for each batch, representing a Merkle tree of included transactions.
+            - This allows users to prove transaction inclusion by providing transaction details, the batch root, and a Merkle proof.
+    - **Validity proofs**
+        - **Proof types:** ZK-rollups primarily use ZK-SNARKs or ZK-STARKs for validity proofs.
+        - **ZK-SNARKs:**
+            - Smaller proof sizes, faster verification.
+            - Require a trusted setup (CRS).
+        - **ZK-STARKs:**
+            - No trusted setup, more scalable, quantum-resistant.
+            - Larger proof sizes, more expensive verification.
+        - **Proof generation:**
+            - Operator validates transactions and creates a batch.
+            - Inputs for proving circuit include Merkle tree roots, proofs for transaction and account inclusion, and intermediate state roots.
+            - Proving circuit verifies transactions and computes validity proof.
+        - **Proof verification:**
+            - L1 contract verifies proof using pre-state root, post-state root, batch root, and transaction inputs.
+            - Upon successful verification, the contract updates its state tree.
+    - Entries and exits
+        - **Deposit process:**
+            - Users deposit tokens into the rollup contract on L1.
+            - Operator submits deposit transactions to rollup contract.
+        - **Fund usage:**
+            - Users can transact within the rollup once funds are deposited.
+            - Balance verification possible using Merkle proofs.
+        - **Withdrawal process:**
+            - User initiates exit by sending assets to a burn account.
+            - Operator includes transaction in a batch.
+            - User submits withdrawal request with Merkle proof, transaction data, batch root, and L1 address.
+            - Rollup contract verifies proof and executes exit, sending funds to L1.
