@@ -127,13 +127,9 @@ category: LEARNING
 
 ### Message Format
 
-- Request
+- Request: ![Định dạng gói tin yêu cầu HTTP Request Message](public/network/application-layer/2.png)
 
-![Định dạng gói tin yêu cầu HTTP Request Message](public/network/application-layer/2.png)
-
-- Response
-
-![Định dạng gói tin phản hồi HTTP Response Message](public/network/application-layer/3.png)
+- Response: ![Định dạng gói tin phản hồi HTTP Response Message](public/network/application-layer/3.png)
 
 ### Cookies
 
@@ -273,6 +269,6 @@ category: LEARNING
 ### CDN (Content Provider Network)
 
 - Là mạng quản lý các server ở nhiều khu vực địa lý khác nhau, trong đó lưu trữ nhiều bản lưu của các video, các nội dung web khác trong server
-    - CDN hướng người dùng đến khu vực có chất lượng tốt nhất
+- CDN hướng người dùng đến khu vực có chất lượng tốt nhất
 - Các CDN hoạt động theo nguyên lý: enter deep và bring home
 - CDN có thể là private hoặc thuộc về một bên thứ ba

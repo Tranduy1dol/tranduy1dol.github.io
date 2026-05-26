@@ -4,15 +4,13 @@ date: 2026-05-26
 excerpt: Tìm hiểu về tầng giao vận (Transport Layer), các giao thức TCP và UDP.
 category: LEARNING
 ---
-
 ## Tổng quan
 
 ### Quan hệ với Network Layer
 
 - Khác biệt với network layer:
-    - Transport layer vận chuyển thông tin giữa các process chạy trên các host khác nhau
-    - Network layer vận chuyển thông tin giữa các host khác nhau
-
+	- Transport layer vận chuyển thông tin giữa các process chạy trên các host khác nhau
+	- Network layer vận chuyển thông tin giữa các host khác nhau
 ### Protocol và service của transport layer
 
 - Transport protocol: TCP, UDP
@@ -65,8 +63,7 @@ category: LEARNING
         - Nếu xảy ra tràn số, kết quả sẽ lược bỏ các bit có thứ tự cao hơn 16
         - VD:  đoạn tin chia được thành 2 từ máy `1011101110110101` và `1000111100001100` sẽ có checksum là `1011010100111101` (là bù 1 của tổng 2 từ máy trên)
 - Phía gửi tính giá trị trên của các trường khác (trừ checksum) rồi đưa vào trường checksum
-- Phía nhận tính tổng của tất cả các đoạn 16 bit (kể cả checksum) rồi kiểm tra xem đúng không. Nếu kết quả của tổng là `1111111111111111` thì kết quả được coi là hợp lệ.
-    - Ngược lại thì chắc chắn đã xuất hiện lỗi
+- Phía nhận tính tổng của tất cả các đoạn 16 bit (kể cả checksum) rồi kiểm tra xem đúng không. Nếu kết quả của tổng là `1111111111111111` thì kết quả được coi là hợp lệ. Ngược lại thì chắc chắn đã xuất hiện lỗi.
 - UDP không cung cấp phương pháp nào để khắc phục lỗi
 
 ## Nguyên lý truyền tin đáng tin cậy
@@ -83,13 +80,7 @@ category: LEARNING
 - rdt 1.0: Reliable transfer trong điều kiện chắc chắn đường truyền đáng tin cậy
     - Điều kiện: không có lỗi bit, không mất tin
     - FSM (máy hữu hạn trạng thái) miêu tả
-    
-    
-
-![FSM cho giao thức rdt 1.0 truyền dữ liệu tin cậy trên kênh truyền hoàn hảo](public/network/transport-layer/3.png)
-
-    
-
+    - ![FSM cho giao thức rdt 1.0 truyền dữ liệu tin cậy trên kênh truyền hoàn hảo](public/network/transport-layer/3.png)
 ### ARQ Protocol
 
 - rdt 2.0: Trong điều kiện kênh truyền tin có lỗi về bit
@@ -101,21 +92,9 @@ category: LEARNING
             - Cơ chế này gọi là ARQ (Automatic Repeat reQuest)
         - Theo cách này, rdt 2.0 là stop-and-wait protocol
     - FSM:
-        - Bên gửi:
-        
-        
-
-![FSM phía gửi của rdt 2.0 (truyền tin có lỗi bit)](public/network/transport-layer/4.png)
-
-        
-        - Bên nhận:
-        
-        
-
-![FSM phía nhận của rdt 2.0 (truyền tin có lỗi bit)](public/network/transport-layer/5.png)
-
-        
-
+        - Bên gửi: ![FSM phía gửi của rdt 2.0 (truyền tin có lỗi bit)](public/network/transport-layer/4.png)
+		
+        - Bên nhận: ![FSM phía nhận của rdt 2.0 (truyền tin có lỗi bit)](public/network/transport-layer/5.png)
 ### Sequence number
 
 - rdt 2.1: Trong điều kiện truyền tin có lỗi, và việc gửi ACK/NAK cũng bị lỗi
@@ -125,20 +104,10 @@ category: LEARNING
         - Để tránh trùng lặp, gắn thêm id (sequence number) cho mỗi gói tin, và làm bên nhận xoá bỏ trùng lặp
             - Sequence number chỉ cần là 0 và 1: nếu bên nhận nhận được số giống gói cuối đã nhận, nó sẽ coi là trùng lặp
     - FSM:
-        - Bên gửi:
+        - Bên gửi: ![FSM phía gửi của rdt 2.1 (xử lý lỗi ACK/NAK bị nhiễu)](public/network/transport-layer/6.png)
         
-        
+        - Bên nhận: ![FSM phía nhận của rdt 2.1 (xử lý lỗi ACK/NAK bị nhiễu)](public/network/transport-layer/7.png)
 
-![FSM phía gửi của rdt 2.1 (xử lý lỗi ACK/NAK bị nhiễu)](public/network/transport-layer/6.png)
-
-        
-        - Bên nhận:
-        
-        
-
-![FSM phía nhận của rdt 2.1 (xử lý lỗi ACK/NAK bị nhiễu)](public/network/transport-layer/7.png)
-
-        
 - rdt 2.2: Điều kiện như 2.1 nhưng loại bỏ thông báo NAK
     - Giải pháp:
         - Phía nhận sẽ gửi ACK + sequence number của gói cuối cùng nhận được thành công
@@ -150,22 +119,10 @@ category: LEARNING
     - Giải pháp:
         - Chờ ACK một khoảng thời gian nhất định, nếu không nhận được thì phải gửi lại (cơ chế timeout)
             - Có thể xảy ra tình huống ACK gửi lại bị chậm dẫn đến timeout trước, nhưng không ảnh hưởng gì
-        
-        
+            - ![Kịch bản hoạt động của rdt 3.0 trong điều kiện không mất gói](public/network/transport-layer/8.png)
+            - ![Kịch bản hoạt động của rdt 3.0 khi xảy ra mất gói tin](public/network/transport-layer/9.png)
+            - ![Kịch bản hoạt động của rdt 3.0 khi mất ACK hoặc xảy ra hiện tượng Timeout](public/network/transport-layer/10.png)
 
-![Kịch bản hoạt động của rdt 3.0 trong điều kiện không mất gói](public/network/transport-layer/8.png)
-
-        
-        
-
-![Kịch bản hoạt động của rdt 3.0 khi xảy ra mất gói tin](public/network/transport-layer/9.png)
-
-        
-        
-
-![Kịch bản hoạt động của rdt 3.0 khi mất ACK hoặc xảy ra hiện tượng Timeout](public/network/transport-layer/10.png)
-
-        
 - Tới đây ta đã xây dựng thành công một giao thức truyền tin đáng tin cậy (theo cơ chế stop-and wait)
 
 ### Giao thức truyền tin đáng tin cậy có pipeline
@@ -279,20 +236,9 @@ $$
 ![Quy trình giải phóng và đóng kết nối TCP](public/network/transport-layer/17.png)
 
 - Trong quá trình kết nối, phía gửi và phía nhận sẽ trải qua các TCP state khác nhau:
-    - Phía gửi:
+    - Phía gửi: ![FSM biểu diễn các trạng thái hoạt động phía gửi TCP](public/network/transport-layer/18.png)
     
-    
-
-![FSM biểu diễn các trạng thái hoạt động phía gửi TCP](public/network/transport-layer/18.png)
-
-    
-    - Phía nhận:
-    
-    
-
-![FSM biểu diễn các trạng thái hoạt động phía nhận TCP](public/network/transport-layer/19.png)
-
-    
+    - Phía nhận: ![FSM biểu diễn các trạng thái hoạt động phía nhận TCP](public/network/transport-layer/19.png)
 
 ## Nguyên lý kiểm soát tắc nghẽn
 
@@ -325,11 +271,9 @@ $$
 - Ý tưởng: Phía gửi sẽ thay đổi tốc độ gửi dựa trên tình hình giao thông mạng hiện tại
 - Cách kiểm soát tốc độ gửi:
     - Phía gửi giữ một giá trị congestion window `cwnd` là tốc độ mà TCP có thể gửi tin vào mạng. Lượng tin gửi đi cần thoả mãn:
-    
     $$
     LastByteSend - LastByteACK \leq \min\{cwnd, rwnd\}
     $$
-    
     - Giá trị `cwnd` thay đổi được và làm thay đổi tốc độ gửi gói tin
         - Tính chất này gọi là self-clocking
 - Cách TCP nhận biết có tắc nghẽn

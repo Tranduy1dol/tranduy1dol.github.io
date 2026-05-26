@@ -4,7 +4,6 @@ date: 2026-05-26
 excerpt: Chi tiết về Control Plane và các thuật toán định tuyến trong tầng mạng.
 category: LEARNING
 ---
-
 ## Thuật toán định tuyến
 
 - Mục tiêu: Tìm đường đi (path, gồm nhiều link) tốt nhất từ nguồn đến đích

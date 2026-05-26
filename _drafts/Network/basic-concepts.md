@@ -4,7 +4,6 @@ date: 2026-05-26
 excerpt: Tổng quan và các khái niệm cơ bản về mạng máy tính.
 category: LEARNING
 ---
-
 ## Internet
 
 - Là mạng gồm hàng tỷ các thiết bị kết nối với nhau
@@ -36,29 +35,15 @@ category: LEARNING
 
 - Là các mạng nối với edge router (router đầu tiên sau end system)
 - Home network:
-    - DSL (digital subscriber line): loại công nghệ giúp truyền internet qua đường dây điện thoại có sẵn
-        
-        
-
-![Mô hình kết nối Internet qua đường dây thuê bao số DSL](public/network/basic-concepts/2.png)
-
-        
-        - ISP của đường dây điện thoại cũng là ISP của mạng
-        - Các modem của khách hàng trao đổi thông tin qua đường dây này với DSLAM (DSL access multiplexer) đặt ở trụ sở (CO) nhà mạng
-        - Đường dây mang các tín hiệu khác nhau ở các tần số khác nhau, gồm band upstream (nhanh), band downstream (vừa), band điện thoại (chậm)
-            - Vì vậy các công việc vẫn được tiến hành độc lập
-    - Cable Internet access: loại công nghệ giúp truyền internet qua đường cáp truyền hình có sẵn
-        
-        
-
-![Mô hình kết nối Internet qua mạng cáp truyền hình](public/network/basic-concepts/3.png)
-
-        
+    - DSL (digital subscriber line): loại công nghệ giúp truyền internet qua đường dây điện thoại có sẵn: ![Mô hình kết nối Internet qua đường dây thuê bao số DSL](public/network/basic-concepts/2.png)
+	  - ISP của đường dây điện thoại cũng là ISP của mạng
+	- Các modem của khách hàng trao đổi thông tin qua đường dây này với DSLAM (DSL access multiplexer) đặt ở trụ sở (CO) nhà mạng
+	- Đường dây mang các tín hiệu khác nhau ở các tần số khác nhau, gồm band upstream (nhanh), band downstream (vừa), band điện thoại (chậm). Vì vậy các công việc vẫn được tiến hành độc lập
+    - Cable Internet access: loại công nghệ giúp truyền internet qua đường cáp truyền hình có sẵn. ![Mô hình kết nối Internet qua mạng cáp truyền hình](public/network/basic-concepts/3.png)
         - Internet access có chung nhà cung cấp với cáp
         - Một ví dụ cho loại này là HFC (hybrid fiber coax, trên hình)
         - Cần dùng các modem đặc trưng (cable modem)
     - Các công nghệ khác: FITH, 5G
-
 #### Enterprise network
 
 - Ethernet
@@ -110,31 +95,14 @@ category: LEARNING
             - Nếu không lưu lại ở switch thì chỉ mất $\frac{L}{R}$.
             - Nếu gửi thêm $m-1$ gói tin nữa thì sẽ có delay là $\frac{(n+1)L}{R}$
         - Trường hợp có $N$ link cùng rate giữa nguồn và đích, và cần gửi $M$ gói tin thì delay cho một gói tin và tổng delay là
-            
-            
-
-$$
-            d=N\frac{L}{R}
-            $$
-            
-            $$
-            D=(M+1)N\frac{L}{R}
-            $$
-            
-    
-    
-
-![Cơ chế lưu trữ và chuyển tiếp (Store-and-Forward)](public/network/basic-concepts/4.png)
-
-    
-    - Cơ chế queueing
+	        - $$ d=N\frac{L}{R} $$
+	        - $$ D=(M+1)N\frac{L}{R} $$
+			- ![Cơ chế lưu trữ và chuyển tiếp (Store-and-Forward)](public/network/basic-concepts/4.png)
+	 
+	 - Cơ chế queueing
         - Gói tin chờ xử lý ở RAM của router nếu tốc độ nó đến quá nhanh so với tốc độ của link
             - Nếu RAM của router hiện tại đã đầy, gói tin truyền đến router sẽ bị mất
-    
-    
-
-![Hiện tượng hàng đợi (Queueing) và mất gói tin tại router](public/network/basic-concepts/5.png)
-
+            - ![Hiện tượng hàng đợi (Queueing) và mất gói tin tại router](public/network/basic-concepts/5.png)
     
     - Cơ chế packet switching là đặc thù cho internet
 - Circuit switching
@@ -169,21 +137,8 @@ $$
     - Transmission delay: thời gian chuyển gói tin qua link từ nguồn đến đích, tính bằng $\frac{L}{R}$
     - Propagation delay: thời gian xung tín hiệu di chuyển trên link, thường không đáng kể
         - Tính bằng $\frac{\mathcal{l}}{v}$, với  $l$ là độ dài link và $v$ là vận tốc của xung tín hiệu
-- Thời gian delay trong một router tính bằng
-
-$$
-
-d_{nodal}=d_{proc}+d_{queue}+d_{trans}+d_{prop}
-
-$$
-
-- Thời gian delay trong kết nối end-to-end tính bằng
-
-$$
-
-d_{e-e}=N(d_{proc}+d_{trans}+d_{prop})
-$$
-
+- Thời gian delay trong một router tính bằng $$ d_{nodal}=d_{proc}+d_{queue}+d_{trans}+d_{prop} $$
+- Thời gian delay trong kết nối end-to-end tính bằng $$ d_{e-e}=N(d_{proc}+d_{trans}+d_{prop}) $$
 #### Throughput
 
 - Throughput tức thời trong một thời điểm là tốc độ nhận gói tin của bên đích lúc đó

@@ -4,7 +4,6 @@ date: 2026-05-26
 excerpt: Chi tiết về Data Plane trong tầng mạng (Network Layer).
 category: LEARNING
 ---
-
 ## Tổng quan về network layer
 
 - Các service và protocol:
@@ -77,39 +76,22 @@ category: LEARNING
         - Có tốc độ chậm, phụ thuộc tốc độ RAM
         - Chỉ chuyển được một datagram một lần
         - Không sử dụng trong router hiện nay
-    
-    
-
-![Cơ chế chuyển mạch thông qua Bộ nhớ (Memory Switching)](public/network/network-layer-data-plane/3.png)
-
-    
+        - ![Cơ chế chuyển mạch thông qua Bộ nhớ (Memory Switching)](public/network/network-layer-data-plane/3.png)
     - Chuyển qua bus
         - Chuyển datagram thông qua một bus
         - Có tốc độ phụ thuộc vào độ rộng của băng thông bus
         - Chỉ chuyển được một datagram một lần
         - Dùng trong hệ thống không cần tốc độ cao
-    
-    
-
-![Cơ chế chuyển mạch thông qua Bus chung (Bus Switching)](public/network/network-layer-data-plane/4.png)
-
-    
+        - ![Cơ chế chuyển mạch thông qua Bus chung (Bus Switching)](public/network/network-layer-data-plane/4.png)
     - Chuyển qua interconnection network
         - Dùng các loại mạng nối kiểu crossbar, clos, … cấu tạo từ nhiều bus
         - Tốc độ rất nhanh, nhưng đắt
-    
-    
-
-![Cơ chế chuyển mạch qua mạng kết nối chéo (Interconnection Network)](public/network/network-layer-data-plane/5.png)
-
-    
-
+        - ![Cơ chế chuyển mạch qua mạng kết nối chéo (Interconnection Network)](public/network/network-layer-data-plane/5.png)
 ### Output port processing
 
 ![Quy trình xử lý gói tin tại cổng đầu ra (Output Port Processing)](public/network/network-layer-data-plane/6.png)
 
 - Đưa gói tin rời khỏi queue để chuyển đi chỗ khác
-
 ### Queuing
 
 - Các gói tin sẽ đợi ở cả input port và output port
@@ -120,12 +102,7 @@ category: LEARNING
     - Các gói tin sẽ đợi được chuyển đi nếu transmission rate của switch tốt hơn của link
     - Nếu queue quá dài, gói tin ở cuối sẽ bị mất
     - Các gói tin được chuyển đi theo cơ chế packet scheduling
-- Lượng buffer cần thiết cho mỗi cổng là
-
-$$
-B = \frac{RTT\times C}{\sqrt{N}}
-$$
-
+- Lượng buffer cần thiết cho mỗi cổng là $$B = \frac{RTT\times C}{\sqrt{N}}$$
 ### Packet scheduling
 
 - FIFO (first in first out)
@@ -179,16 +156,11 @@ $$
 
 ### Subnet
 
-- Là tập hợp tất cả các interface có thể kết nối trực tiếp mà không cần qua router
-    - Có thể chúng được kết nối qua một Ethernet switch hoặc WAP
-- Địa chỉ IP của các interface trong cùng một subnet có các bit cao (bên trái) giống nhau
-    - Phần giống nhau gọi là subnet part, phần kia gọi là host part
-- Cách xác định subnet
-    - Ngắt tất cả các đường nối giữa interface và router, các thành phần liên thông còn lại là các subnet
-- Subnet mask: Số xác định độ dài subnet part của địa chỉ IP
-    - VD: 223.1.1.0/24 có subnet mask là /24 hoặc 255.255.255.0
-- Subnet address: Subnet part của địa chỉ IP của một interface
-    - `subnet_mask & ip_address = subnet_ip_address`
+- Là tập hợp tất cả các interface có thể kết nối trực tiếp mà không cần qua router. Có thể chúng được kết nối qua một Ethernet switch hoặc WAP
+- Địa chỉ IP của các interface trong cùng một subnet có các bit cao (bên trái) giống nhau. Phần giống nhau gọi là subnet part, phần kia gọi là host part
+- Cách xác định subnet: Ngắt tất cả các đường nối giữa interface và router, các thành phần liên thông còn lại là các subnet
+- Subnet mask: Số xác định độ dài subnet part của địa chỉ IP. VD: 223.1.1.0/24 có subnet mask là /24 hoặc 255.255.255.0
+- Subnet address: Subnet part của địa chỉ IP của một interface. `subnet_mask & ip_address = subnet_ip_address`
 - Cách đánh địa chỉ CIDR: `a.b.c.d/x`, với `x` là số bit trong phần subnet
 - Lớp địa chỉ IP:
     - A: 1.0.0.0 đến 127.255.255.255 (bit cao nhất là 0)
@@ -215,9 +187,7 @@ $$
         - Ở bước này, có thể có nhiều DHCP server cùng trả lời một client và do đó sẽ có nhiều DHCP offer message
     - DHCP request: Client broadcast DHCP request message, chứa một địa chỉ IP mà DHCP server nào đó cấp cho nó
     - DHCP ACK: DHCP server broadcast DHCP ACK message để xác nhận đã hoàn thành cung cấp địa chỉ IP
-
-![Quy trình 4 bước cấp phát địa chỉ IP động qua giao thức DHCP](public/network/network-layer-data-plane/8.png)
-
+    - ![Quy trình 4 bước cấp phát địa chỉ IP động qua giao thức DHCP](public/network/network-layer-data-plane/8.png)
 - DHCP cung cấp thêm:
     - Địa chỉ IP của first-hop router (router đầu tiên cần đến để đi ra ngoài mạng)
     - Tên và địa chỉ IP của DNS server
@@ -236,8 +206,7 @@ $$
 
 - Router có NAT chỉ có một địa chỉ IP thay vì là một subnet IP. Toàn bộ các thiết bị trong một local network sử dụng chung địa chỉ IP này để giao tiếp với bên ngoài
 - Các máy bên trong vẫn có IP riêng, nhưng là private IP address. Khi một gói tin đi ra ngoài, nó luôn được đánh địa chỉ IP của mạng, với port number khác nhau phụ thuộc vào nguồn trong mạng
-- Cách đánh địa chỉ:
-    - Địa chỉ private sử dụng một trong 3 địa chỉ sau: 10/8, 172.16/12, 192.168/16
+- Cách đánh địa chỉ: Địa chỉ private sử dụng một trong 3 địa chỉ sau: 10/8, 172.16/12, 192.168/16
 - Mô phỏng quá trình gửi tin từ một máy trong local network:
     - Một host gửi tin từ địa chỉ a.b.c.d:p
     - Gói tin từ router đi ra dùng địa chỉ IP của mạng, port number lấy từ NAT translation table lưu trong router. Mỗi thiết bị ứng với một port number khác nhau
@@ -251,13 +220,7 @@ $$
 - Sử dụng 128 bit để đánh địa chỉ IP
 - Luôn dùng 40 byte làm header
 - Xử lý các datagram theo flow, là các loại tin mà host của nó yêu cầu được xử lý theo cách đặc biệt
-- Datagram format:
-    
-    
-
-![Cấu trúc định dạng gói tin IPv6 Datagram](public/network/network-layer-data-plane/10.png)
-
-    
+- Datagram format: ![Cấu trúc định dạng gói tin IPv6 Datagram](public/network/network-layer-data-plane/10.png)
     - Version: số 6 (IPv6)
     - Traffic class: giống TOS ở IPv4 nhưng đặc trưng cho flow
     - Flow label: đánh loại flow

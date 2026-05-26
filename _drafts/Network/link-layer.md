@@ -4,7 +4,6 @@ date: 2026-05-26
 excerpt: Tìm hiểu về tầng liên kết dữ liệu (Link Layer) và các giao thức đa truy nhập.
 category: LEARNING
 ---
-
 ## Tổng quan
 
 - Các thiết bị chạy tầng này gọi là node
@@ -61,16 +60,11 @@ category: LEARNING
         - Số $R$ được sinh bằng cách tìm số dư trong phép chia $\frac{D\times 2^r}{G}$
         - Tất cả các phép chia (kể cả phép chia sinh ra số $R$) là phép toán sau: Thực hiện phép chia như bình thường, tuy nhiên mọi phép cộng và phép trừ trong quá trình tính phép chia được chuyển thành phép xor.
         - Ví dụ, xét dữ liệu có $D = 101110, d = 6, G = 1001, r = 3$. Phép chia để tìm số $R$ sẽ có dạng như dưới hình. Ta tìm được $R = 011$
-            
-            
-
-![Ví dụ minh họa phép toán chia nhị phân dùng XOR trong CRC](public/network/link-layer/4.png)
-
-            
+		- ![Ví dụ minh họa phép toán chia nhị phân dùng XOR trong CRC](public/network/link-layer/4.png)
     - Bên gửi phát hiện lỗi bằng cách kiểm tra số dư trong phép chia trên. Nếu số dư khác $0$, chắc chắn đã xuất hiện lỗi.
 - Có quy định chuẩn cho các giá trị $G$, với $r + 1 \in\{8, 16, 32\}$
     - Chẳng hạn, với 32 bit thì IEEE quy định  $G = 100000100110000010001110110110111$
-- Nếu lấy giá trị $G$ theo đúng chuẩn, chắc chắn phát hiện được mọi lỗi với tối đa $r + 1$ bit.
+	- Nếu lấy giá trị $G$ theo đúng chuẩn, chắc chắn phát hiện được mọi lỗi với tối đa $r + 1$ bit.
 
 ## Multiple Access Links and Protocols
 
@@ -103,13 +97,8 @@ category: LEARNING
 ### Giao thức truy cập ngẫu nhiên
 
 - Ý tưởng: Nếu xảy ra va chạm, mỗi nút gửi tin sẽ đợi một khoảng thời gian ngẫu nhiên trước khi gửi lại
-- Giao thức ALOHA chia slot:
-    
-    
+- Giao thức ALOHA chia slot: ![Kịch bản xảy ra va chạm dữ liệu trong giao thức ALOHA chia slot (Slotted ALOHA)](public/network/link-layer/5.png)
 
-![Kịch bản xảy ra va chạm dữ liệu trong giao thức ALOHA chia slot (Slotted ALOHA)](public/network/link-layer/5.png)
-
-    
     - Giả sử có:
         - Tất cả các frame chứa đúng $L$ bit
         - Thời gian được chia thành các slot có kích thước $\frac{L}{R}$ (giây)
@@ -125,22 +114,10 @@ category: LEARNING
         - Là tỉ lệ thành công về lâu dài trong trường hợp có nhiều nút và nhiều thông tin được gửi
         - Xác suất để tất cả các nút nút thành công của ALOHA chia slot là $Np(1-p)^{N-1}$
         - Ở $p$ tốt nhất, giao thức này có độ hiệu quả là $\frac{1}{e}$ chỉ làm mạng hoạt động 37% thời gian
-- Giao thức ALOHA (không chia slot):
-    
-    
-
-![Kịch bản va chạm dữ liệu trong giao thức ALOHA thuần túy (Pure ALOHA)](public/network/link-layer/6.png)
-
-    
+- Giao thức ALOHA (không chia slot): ![Kịch bản va chạm dữ liệu trong giao thức ALOHA thuần túy (Pure ALOHA)](public/network/link-layer/6.png)
     - Khi một nút nhận được frame, nó gửi ngay lập tức. Nếu có va chạm, nó gửi lại ngay lập tức với xác suất $p$ mỗi một khoảng thời gian bằng thời gian truyền tin
     - Xác suất để tất cả các nút thành công là $Np(1-p)^{2(N-1)}$. Độ hiệu quả là $\frac{1}{2e}$
-- Giao thức CSMA/CD (Carrier Sense Multiple Access width Collide Detection)
-    
-    
-
-![Cơ chế lắng nghe kênh truyền (Carrier Sense) và phát hiện va chạm (Collision Detection)](public/network/link-layer/7.png)
-
-    
+- Giao thức CSMA/CD (Carrier Sense Multiple Access width Collide Detection): ![Cơ chế lắng nghe kênh truyền (Carrier Sense) và phát hiện va chạm (Collision Detection)](public/network/link-layer/7.png)
     - Các ý tưởng giải quyết vấn đề va chạm:
         - Một nút sẽ lắng nghe kênh truyền chuẩn bị dùng, đợi đến khi không có một hoạt động vận chuyển nào khác mới bắt đầu chuyển
         - Nếu phát hiện đang có tin được truyền đi trong thời điểm đó, ngừng truyền tin ngay lập tức và đợi một khoảng thời gian ngẫu nhiên rồi truyền tiếp
@@ -151,13 +128,7 @@ category: LEARNING
         - Nếu không gặp tín hiệu nào, frame coi như được chuyển xong. Nếu có, nó lập tức dừng truyền frame
         - Nếu frame bị dừng truyền, adapter đợi một khoảng thời gian ngẫu nhiên rồi làm lại từ bước 2
     - Chọn khoảng thời gian ngẫu nhiên bằng thuật binary exponential backoff: Nếu có $n$ gói tin bị va chạm, khoảng thời gian được chọn ngẫu nhiên trong khoảng $[0, 2^n)$
-    - Độ hiệu quả của giao thức này là
-    
-    $$
-    \frac{1}{1 + \frac{5d_{prop}}{d_{trans}}}
-    $$
-    
-
+    - Độ hiệu quả của giao thức này là $$ \frac{1}{1 + \frac{5d_{prop}}{d_{trans}}}$$
 ### Giao thức lần lượt
 
 - Polling protocol:
@@ -232,13 +203,7 @@ category: LEARNING
 
 - Hub: thiết bị physical layer xử lý trên các bit, bằng cách tăng năng lượng cho một bit khi đến nó để đẩy nó sang thiết bị khác
 - Switch: thiết bị hoạt động đến link layer
-- Cấu trúc frame:
-    
-    
-
-![Cấu trúc khung dữ liệu Ethernet Frame tiêu chuẩn](public/network/link-layer/10.png)
-
-    
+- Cấu trúc frame: ![Cấu trúc khung dữ liệu Ethernet Frame tiêu chuẩn](public/network/link-layer/10.png)
     - Data (46-1500B): chứa IP datagram. Ethernet chỉ cho phép phần này nặng tối đa 1500B (MTU = 1500). Nếu phần này nhỏ hơn 46B, nó sẽ được nhồi thêm vào cho đủ 46B (Phần thực tế có thể xác định bằng trường length trong datagram)
     - Destination address (6B): Địa chỉ MAC của đích
         - Nếu ở đích, gói tin nhận được có địa chỉ MAC không khớp với địa chỉ MAC của nó, nó sẽ huỷ bỏ gói tin
@@ -286,13 +251,7 @@ category: LEARNING
     - Loại bỏ va chạm: các frame được buffer và không bao giờ có 2 frame được gửi cùng 1 lúc
     - Các link được sử dụng nối với switch có thể dùng các công nghệ khác nhau với tốc độ khác nhau
     - Switch làm tăng tính bảo mật và hỗ trợ quản lý mạng tốt hơn: switch có thể biết máy hỏng và tự ngắt kết nối đến máy đó
-- So sánh switch và router
-    
-    
-
-![Bảng so sánh đặc điểm vận hành giữa Switch và Router](public/network/link-layer/11.png)
-
-    
+- So sánh switch và router: ![Bảng so sánh đặc điểm vận hành giữa Switch và Router](public/network/link-layer/11.png)
     - Switch:
         - Tốc độ lọc và chuyển tiếp rất nhanh (vì chỉ cần chuyển frame lên layer 2)
         - Topo của mạng dùng switch bị giới hạn dưới dạng cây khung (nếu có chu trình gói tin sẽ bị chuyển đi vô hạn)
@@ -304,13 +263,7 @@ category: LEARNING
         - Chống link layer broadcast storm
         - Router không có tính chất plug-and-play: việc gán địa chỉ IP là một công việc khác không tự động
         - Router xử lý trên packet lâu hơn là switch vì phải lên tới layer 3
-        
-        
-
-![So sánh đường truyền dữ liệu qua Hub, Switch và Router](public/network/link-layer/12.png)
-
-        
-
+- ![So sánh đường truyền dữ liệu qua Hub, Switch và Router](public/network/link-layer/12.png)
 ### VLAN
 
 ![Mạng LAN ảo (VLAN) giúp cô lập vùng quảng bá vật lý](public/network/link-layer/13.png)
@@ -327,25 +280,15 @@ category: LEARNING
 - Để di chuyển giữa hai nhóm VLAN khác nhau, ta nối một interface của VLAN với một router rồi config để interface đó thuộc cả hai nhóm VLAN
 - VLAN trunk: dành ra 2 cổng dùng để nối 2 VLAN switch khác nhau, 1 cổng nối ra, 1 cổng nối vào
     - Trong các frame di chuyển trong VLAN, trường VLAN tag sẽ được thêm vào để cho biết frame này xuất phát ở VLAN nào
-        
-        
+    - ![Cấu trúc khung tin Ethernet có chèn thêm trường VLAN Tagging (802.1Q)](public/network/link-layer/14.png)
 
-![Cấu trúc khung tin Ethernet có chèn thêm trường VLAN Tagging (802.1Q)](public/network/link-layer/14.png)
-
-        
-
-## Ảo hoá mạng và MPLS (không học)
+## Ảo hoá mạng và MPLS 
 
 ### MPLS (Multiprotocol Label Switching)
 
 - Ý tưởng: tăng tốc IP forwarding bằng cách sử dụng fixed-length label
 - Frame theo cơ chế này sẽ đặt thêm một header nhỏ giữa header của link layer và header của network layer
-    
-    
-
-![Định dạng các trường nhãn trong MPLS Header](public/network/link-layer/15.png)
-
-    
+- ![Định dạng các trường nhãn trong MPLS Header](public/network/link-layer/15.png)
 - Frame MPLS chỉ có thể truyền trong các router đặc biệt gọi là label-switched router
     - Router này chỉ cần dựa vào MPLS label là có thể chuyển đến output interface mà không cần biết địa chỉ IP
 - MPLS cho phép truyền frame qua các đường đi mà bình thường dùng IP không thể đi qua được, bằng cách buộc một phần giao thông mạng phải đi theo một con đường, phần còn lại đi theo đường khác
