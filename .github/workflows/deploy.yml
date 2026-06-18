@@ -30,8 +30,9 @@ jobs:
       - name: Install dependencies
         run: |
           for i in 1 2 3; do
-            npm ci && break
-            if [ "$i" -lt 3 ]; then
+            if npm ci; then
+              break
+            elif [ "$i" -lt 3 ]; then
               sleep 10
             else
               exit 1
