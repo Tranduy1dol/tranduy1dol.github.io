@@ -29,7 +29,13 @@ jobs:
         uses: actions/configure-pages@v5
       - name: Install dependencies
         run: |
-          npm ci
+          for i in 1 2 3; do
+            npm ci && break
+            if [ "$i" -eq 3 ]; then
+              exit 1
+            fi
+            sleep 10
+          done
           npm run lint:md
       - name: Build with Next.js
         run: npm run build
