@@ -2,7 +2,6 @@
 title: "Kafka durability: tại sao message không mất và tại sao nó nhanh"
 date: 2026-05-12
 excerpt: Kafka xử lý hàng triệu messages/giây mà không mất data. Cơ chế bên dưới khá quen thuộc.
-category: SYSTEMS
 ---
 ## Mình đã build mini-Kafka mà không biết
 

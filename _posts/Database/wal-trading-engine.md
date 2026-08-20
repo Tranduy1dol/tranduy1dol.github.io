@@ -2,7 +2,6 @@
 title: Mình tự implement WAL mà không biết
 date: 2026-05-10
 excerpt: Implement trước rồi học sau để nhớ nó là gì
-category: SYSTEMS
 ---
 
 ## Lần này là câu chuyện ngược

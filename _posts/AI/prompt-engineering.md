@@ -2,7 +2,6 @@
 title: Mình bị ép phải học prompt engineering
 date: 2026-06-17
 excerpt: Thất nghiệp quá chán. AI chiếm hết jobs rồi. Giờ mình học cách làm việc chung với AI để kiếm việc. Và mình bắt đầu với Prompt Engineering
-category: LEARNING
 ---
 ## Prompt Engineering là gì
 

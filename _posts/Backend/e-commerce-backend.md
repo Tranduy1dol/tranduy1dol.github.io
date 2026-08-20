@@ -2,7 +2,6 @@
 title: Giới thiệu về lập trình Backend bằng Rust
 date: 2026-04-16
 excerpt: Cách mình code một Backend E-Commerce bằng Rust để đưa vào CV
-category: CODING
 ---
 ## Giới thiệu
 
