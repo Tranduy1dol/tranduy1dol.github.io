@@ -10,7 +10,6 @@ export type SpotlightData = {
     description: string;
     link: string;
     image?: string;
-    category?: string;
     order?: number;
 };
 
@@ -34,15 +33,20 @@ export function getSpotlightProjects(): SpotlightData[] {
         const fileContents = fs.readFileSync(fullPath, 'utf8');
         const matterResult = matter(fileContents);
 
-        return {
+        const project: SpotlightData = {
             id,
             title: matterResult.data.title,
             description: matterResult.data.description,
             link: matterResult.data.link,
-            image: matterResult.data.image,
-            category: matterResult.data.category,
             order: matterResult.data.order || 0,
         };
+
+        // Omit optional fields when missing — Next.js cannot serialize `undefined`
+        if (matterResult.data.image) {
+            project.image = matterResult.data.image;
+        }
+
+        return project;
     });
 
     // Sort by order (lower first), then by title

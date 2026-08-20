@@ -32,13 +32,13 @@ const Layout = ({ children }: LayoutProps) => {
             {/* Header */}
             <header className="border-b-2 py-6" style={{ borderColor: 'rgb(var(--color-border))' }}>
                 <div className="max-w-7xl mx-auto px-6">
-                    <div className="flex items-baseline justify-between">
-                        <h1 className="text-3xl md:text-4xl">
+                    <div className="flex flex-col items-center">
+                        <h1 className="text-3xl md:text-4xl text-center">
                             <Link href="/" className="no-underline hover:opacity-70 transition-opacity">
-                                Hi, I&apos;m tranduy1dol
+                                tranduy1dol
                             </Link>
                         </h1>
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center justify-center gap-4 mt-3">
                             <time className="text-sm inline-flex items-center gap-2" style={{ color: 'rgb(var(--color-text-muted))' }}>
                                 {isBirthday && (
                                     <LuCake
@@ -48,7 +48,7 @@ const Layout = ({ children }: LayoutProps) => {
                                 )}
                                 {currentDate}
                             </time>
-                            {mounted && (
+                            {mounted ? (
                                 <button
                                     onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
                                     className="p-2 hover:opacity-70 transition-opacity"
@@ -72,6 +72,8 @@ const Layout = ({ children }: LayoutProps) => {
                                         </svg>
                                     )}
                                 </button>
+                            ) : (
+                                <span className="p-2 w-9 h-9" aria-hidden="true" />
                             )}
                         </div>
                     </div>

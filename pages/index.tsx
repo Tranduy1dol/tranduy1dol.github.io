@@ -435,37 +435,47 @@ const Home: NextPage<HomeProps> = ({ allPostsData, allTags, allBooksData, spotli
                                         className="no-underline block group"
                                     >
                                         <div
-                                            className="border-2 p-4 transition-all hover:shadow-lg"
+                                            className="border-2 overflow-hidden transition-all hover:shadow-lg"
                                             style={{
                                                 borderColor: 'rgb(var(--color-border))',
                                                 backgroundColor: 'rgb(var(--color-surface))'
                                             }}
                                         >
-                                            <span
-                                                className="text-xs uppercase tracking-wider mb-2 block"
-                                                style={{ color: 'rgb(var(--color-text-muted))' }}
-                                            >
-                                                {project.category || 'Project'}
-                                            </span>
-                                            <h3
-                                                className="text-sm mb-2 group-hover:opacity-80 transition-opacity"
-                                                style={{ fontFamily: 'var(--font-serif)' }}
-                                            >
-                                                {project.title}
-                                            </h3>
-                                            <p
-                                                className="text-xs leading-relaxed mb-3"
-                                                style={{ color: 'rgb(var(--color-text-muted))' }}
-                                            >
-                                                {project.description}
-                                            </p>
-                                            <span
-                                                className="inline-flex items-center gap-1 text-xs uppercase tracking-wider"
-                                                style={{ color: 'rgb(var(--color-text-muted))' }}
-                                            >
-                                                View Project
-                                                <FiExternalLink className="w-3 h-3" />
-                                            </span>
+                                            {project.image && (
+                                                <div
+                                                    className="aspect-video overflow-hidden border-b-2 relative"
+                                                    style={{ borderColor: 'rgb(var(--color-border))' }}
+                                                >
+                                                    <Image
+                                                        src={project.image}
+                                                        alt={project.title}
+                                                        fill
+                                                        className="object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
+                                                        sizes="(max-width: 1024px) 100vw, 33vw"
+                                                    />
+                                                </div>
+                                            )}
+                                            <div className="p-4">
+                                                <h3
+                                                    className="text-sm mb-2 group-hover:opacity-80 transition-opacity"
+                                                    style={{ fontFamily: 'var(--font-serif)' }}
+                                                >
+                                                    {project.title}
+                                                </h3>
+                                                <p
+                                                    className="text-xs leading-relaxed mb-3"
+                                                    style={{ color: 'rgb(var(--color-text-muted))' }}
+                                                >
+                                                    {project.description}
+                                                </p>
+                                                <span
+                                                    className="inline-flex items-center gap-1 text-xs uppercase tracking-wider"
+                                                    style={{ color: 'rgb(var(--color-text-muted))' }}
+                                                >
+                                                    View Project
+                                                    <FiExternalLink className="w-3 h-3" />
+                                                </span>
+                                            </div>
                                         </div>
                                     </a>
                                 ))}
