@@ -1,9 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
-import { Typewriter } from './Typewriter';
 import { LuCake } from 'react-icons/lu';
 
 type LayoutProps = {
@@ -11,7 +9,6 @@ type LayoutProps = {
 };
 
 const Layout = ({ children }: LayoutProps) => {
-    const router = useRouter();
     const { theme, setTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
 
@@ -19,18 +16,6 @@ const Layout = ({ children }: LayoutProps) => {
     useEffect(() => {
         setMounted(true);
     }, []);
-
-    const navItems = [
-        { href: '/', label: 'Home' },
-        { href: '/about', label: 'About' },
-        { href: '/blog', label: 'Blog' },
-        { href: '/book', label: 'Book' },
-    ];
-
-    const isActive = (path: string) => {
-        if (path === '/') return router.pathname === '/';
-        return router.pathname.startsWith(path);
-    };
 
     const now = new Date();
     const currentDate = now.toLocaleDateString('en-US', {
@@ -45,12 +30,12 @@ const Layout = ({ children }: LayoutProps) => {
     return (
         <div className="min-h-screen" style={{ backgroundColor: 'rgb(var(--color-bg))', color: 'rgb(var(--color-text))' }}>
             {/* Header */}
-            <header className="border-b-2 py-8 mb-16" style={{ borderColor: 'rgb(var(--color-border))' }}>
+            <header className="border-b-2 py-6" style={{ borderColor: 'rgb(var(--color-border))' }}>
                 <div className="max-w-7xl mx-auto px-6">
-                    <div className="flex items-baseline justify-between mb-6">
-                        <h1 className="text-5xl md:text-6xl">
+                    <div className="flex items-baseline justify-between">
+                        <h1 className="text-3xl md:text-4xl">
                             <Link href="/" className="no-underline hover:opacity-70 transition-opacity">
-                                {mounted ? <Typewriter texts={["Hi, I'm tranduy1dol", "Welcome to my blog"]} speed={80} /> : "Hi, I'm tranduy1dol"}
+                                Hi, I&apos;m tranduy1dol
                             </Link>
                         </h1>
                         <div className="flex items-center gap-4">
@@ -90,19 +75,6 @@ const Layout = ({ children }: LayoutProps) => {
                             )}
                         </div>
                     </div>
-                    <nav className="flex gap-8">
-                        {navItems.map((item) => (
-                            <h4 key={item.href}>
-                                <Link
-                                    href={item.href}
-                                    className={`no-underline hover:opacity-60 transition-opacity ${isActive(item.href) ? 'opacity-100' : 'opacity-70'
-                                        }`}
-                                >
-                                    {item.label}
-                                </Link>
-                            </h4>
-                        ))}
-                    </nav>
                 </div>
             </header>
 
@@ -110,89 +82,6 @@ const Layout = ({ children }: LayoutProps) => {
             <main>
                 {children}
             </main>
-
-            {/* Footer */}
-            <footer className="border-t-2 mt-24 py-12" style={{ borderColor: 'rgb(var(--color-border))' }}>
-                <div className="max-w-7xl mx-auto px-6">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
-                        {/* About Section */}
-                        <div>
-                            <h3 className="mb-4">tranduy1dol</h3>
-                            <p className="text-sm leading-relaxed" style={{ color: 'rgb(var(--color-text-muted))' }}>
-                                Code Alchemist — transmuting ideas into Rust APIs & ZK sorcery. Based in Hanoi, Vietnam 🇻🇳
-                            </p>
-                        </div>
-
-                        {/* Navigate Section */}
-                        <div>
-                            <h4 className="mb-4">Navigate</h4>
-                            <ul className="space-y-2 text-sm">
-                                {navItems.map((item) => (
-                                    <li key={item.href}>
-                                        <Link
-                                            href={item.href}
-                                            className="hover:opacity-70 transition-opacity"
-                                            style={{ color: 'rgb(var(--color-text-muted))' }}
-                                        >
-                                            {item.label}
-                                        </Link>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-
-                        {/* Connect Section */}
-                        <div>
-                            <h4 className="mb-4">Connect</h4>
-                            <ul className="space-y-2 text-sm">
-                                <li>
-                                    <a
-                                        href="https://github.com/tranduy1dol"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="hover:opacity-70 transition-opacity"
-                                        style={{ color: 'rgb(var(--color-text-muted))' }}
-                                    >
-                                        GitHub
-                                    </a>
-                                </li>
-                                <li>
-                                    <a
-                                        href="https://twitter.com/tranduy1dol"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="hover:opacity-70 transition-opacity"
-                                        style={{ color: 'rgb(var(--color-text-muted))' }}
-                                    >
-                                        Twitter
-                                    </a>
-                                </li>
-                                <li>
-                                    <a
-                                        href="mailto:contact@tranduy1dol.com"
-                                        className="hover:opacity-70 transition-opacity"
-                                        style={{ color: 'rgb(var(--color-text-muted))' }}
-                                    >
-                                        Email
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div
-                        className="pt-8 border-t flex flex-col md:flex-row justify-between items-center gap-4"
-                        style={{ borderColor: 'rgb(var(--color-text-muted))' }}
-                    >
-                        <p className="text-xs" style={{ color: 'rgb(var(--color-text-muted))' }}>
-                            © {new Date().getFullYear()} tranduy1dol. All rights reserved.
-                        </p>
-                        <p className="text-xs" style={{ color: 'rgb(var(--color-text-muted))' }}>
-                            Designed with intention and care.
-                        </p>
-                    </div>
-                </div>
-            </footer>
         </div>
     );
 };

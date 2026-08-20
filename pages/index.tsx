@@ -2,18 +2,41 @@ import type { GetStaticProps, NextPage } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
 import Image from 'next/image';
-import { getSortedPostsData, PostData } from '@/lib/posts';
+import { useState } from 'react';
+import { getSortedPostsData, getAllTags, PostData, TagCount } from '@/lib/posts';
+import { getSortedBooksData, BookData } from '@/lib/books';
 import { getSpotlightProjects, SpotlightData } from '@/lib/spotlight';
 import { TechStack } from '@/components/TechStack';
-import { FiArrowRight, FiBookOpen, FiExternalLink, FiDownload } from 'react-icons/fi';
+import { FiGithub, FiTwitter, FiLinkedin, FiMail, FiDownload, FiExternalLink } from 'react-icons/fi';
+
+import fs from 'fs';
+import path from 'path';
+import matter from 'gray-matter';
+import { remark } from 'remark';
+import html from 'remark-html';
+
+const socialLinks = [
+    { icon: FiGithub, href: 'https://github.com/tranduy1dol', label: 'GitHub' },
+    { icon: FiTwitter, href: 'https://twitter.com/tranduy1dol', label: 'Twitter' },
+    { icon: FiLinkedin, href: 'https://linkedin.com/in/tranduy1dol', label: 'LinkedIn' },
+    { icon: FiMail, href: 'mailto:contact@tranduy1dol.com', label: 'Email' },
+    { icon: FiDownload, href: '/cv.pdf', label: 'CV', isCV: true },
+];
 
 type HomeProps = {
     allPostsData: PostData[];
+    allTags: TagCount[];
+    allBooksData: BookData[];
     spotlights: SpotlightData[];
+    aboutHtml: string;
 };
 
-const Home: NextPage<HomeProps> = ({ allPostsData, spotlights }) => {
-    const recentPosts = allPostsData.slice(0, 2);
+type ActiveTab = 'blog' | 'book';
+
+const Home: NextPage<HomeProps> = ({ allPostsData, allTags, allBooksData, spotlights, aboutHtml }) => {
+    const [activeTab, setActiveTab] = useState<ActiveTab>('blog');
+    const [searchQuery, setSearchQuery] = useState('');
+    const [selectedTag, setSelectedTag] = useState<string | null>(null);
 
     const formatDate = (dateStr: string) => {
         const date = new Date(dateStr);
@@ -24,6 +47,35 @@ const Home: NextPage<HomeProps> = ({ allPostsData, spotlights }) => {
         }).toUpperCase();
     };
 
+    // Filter posts based on search and selected tag
+    const filteredPosts = allPostsData.filter((post) => {
+        const matchesSearch = searchQuery === '' ||
+            post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            (post.excerpt && post.excerpt.toLowerCase().includes(searchQuery.toLowerCase()));
+
+        const matchesTag = selectedTag === null ||
+            (post.tags && post.tags.includes(selectedTag));
+
+        return matchesSearch && matchesTag;
+    });
+
+    // Render star rating for books
+    const renderRating = (rating?: number) => {
+        if (!rating) return null;
+        return (
+            <div className="flex gap-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                    <span
+                        key={star}
+                        className={star <= rating ? 'opacity-100' : 'opacity-30'}
+                    >
+                        ★
+                    </span>
+                ))}
+            </div>
+        );
+    };
+
     return (
         <>
             <Head>
@@ -32,232 +84,395 @@ const Home: NextPage<HomeProps> = ({ allPostsData, spotlights }) => {
             </Head>
 
             <div className="max-w-7xl mx-auto px-6">
-                {/* Hero Section */}
-                <section className="py-16 md:py-24 text-center">
-                    <h1
-                        className="text-5xl md:text-7xl lg:text-8xl mb-6"
-                        style={{ fontFamily: 'var(--font-serif)' }}
-                    >
-                        Code Alchemist.
-                    </h1>
-                    <p
-                        className="text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed"
-                        style={{
-                            color: 'rgb(var(--color-text-muted))',
-                            fontFamily: 'var(--font-sans)'
-                        }}
-                    >
-                        Hello, I&apos;m <strong style={{ color: 'rgb(var(--color-text))' }}>tranduy1dol</strong> —
-                        transmuting ideas into high-performance Rust APIs,
-                        distributed systems, and Zero-Knowledge sorcery.
-                    </p>
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                        <Link
-                            href="/blog"
-                            className="inline-flex items-center justify-center gap-2 px-8 py-3 text-sm uppercase tracking-wider no-underline transition-all hover:opacity-80"
+                {/* 3-Column Layout */}
+                <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr_260px] gap-8 lg:gap-10">
+
+                    {/* ========== LEFT SIDEBAR ========== */}
+                    <aside className="lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto lg:py-8 py-6 space-y-6">
+                        {/* Avatar with Polaroid Effect */}
+                        <div
+                            className="p-3 border-2 inline-block"
                             style={{
-                                backgroundColor: 'rgb(var(--color-text))',
-                                color: 'rgb(var(--color-bg))'
+                                borderColor: 'rgb(var(--color-border))',
+                                backgroundColor: 'rgb(var(--color-bg))'
                             }}
                         >
-                            <FiBookOpen className="w-4 h-4" />
-                            Read Blog
-                        </Link>
-                        <a
-                            href="/cv.pdf"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center justify-center gap-2 px-8 py-3 border-2 text-sm uppercase tracking-wider no-underline transition-all hover:opacity-70"
-                            style={{ borderColor: 'rgb(var(--color-border))' }}
-                        >
-                            <FiDownload className="w-4 h-4" />
-                            View CV
-                        </a>
-                        <Link
-                            href="/about"
-                            className="inline-flex items-center justify-center gap-2 px-8 py-3 border-2 text-sm uppercase tracking-wider no-underline transition-all hover:opacity-70"
-                            style={{ borderColor: 'rgb(var(--color-border))' }}
-                        >
-                            More About Me
-                            <FiArrowRight className="w-4 h-4" />
-                        </Link>
-                    </div>
-                </section>
-
-                {/* Divider */}
-                <div
-                    className="h-[2px] max-w-xs mx-auto"
-                    style={{ backgroundColor: 'rgb(var(--color-border))' }}
-                />
-
-                {/* Tech Stack Strip */}
-                <TechStack />
-
-                {/* Divider */}
-                <div
-                    className="h-[2px] max-w-xs mx-auto mb-16"
-                    style={{ backgroundColor: 'rgb(var(--color-border))' }}
-                />
-
-                {/* Spotlight Projects Grid */}
-                {spotlights.length > 0 && (
-                    <section className="mb-20">
-                        <div className="flex items-center gap-4 mb-8">
-                            <h2 style={{ fontFamily: 'var(--font-serif)' }}>Spotlight</h2>
-                            <div
-                                className="flex-1 h-[2px]"
-                                style={{ backgroundColor: 'rgb(var(--color-border))' }}
-                            />
+                            <div className="relative w-48 h-48 overflow-hidden">
+                                <Image
+                                    src="/profile.png"
+                                    alt="tranduy1dol"
+                                    fill
+                                    className="object-cover"
+                                    sizes="192px"
+                                    priority
+                                />
+                            </div>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {spotlights.map((project) => (
-                                <a
-                                    key={project.id}
-                                    href={project.link}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="no-underline block group"
-                                >
-                                    <article
-                                        className="border-2 overflow-hidden transition-all hover:shadow-xl h-full flex flex-col"
-                                        style={{
-                                            borderColor: 'rgb(var(--color-border))',
-                                            backgroundColor: 'rgb(var(--color-surface))'
-                                        }}
+
+                        {/* Name & Info */}
+                        <div>
+                            <h3
+                                className="text-xl mb-1"
+                                style={{ fontFamily: 'var(--font-serif)' }}
+                            >
+                                tranduy1dol
+                            </h3>
+                            <p
+                                className="text-sm uppercase tracking-wider mb-3"
+                                style={{ color: 'rgb(var(--color-text-muted))' }}
+                            >
+                                Code Alchemist
+                            </p>
+                            <p
+                                className="text-sm leading-relaxed"
+                                style={{ color: 'rgb(var(--color-text-muted))' }}
+                            >
+                                Transmuting ideas into Rust APIs &amp; ZK sorcery.
+                                Based in Hanoi, Vietnam 🇻🇳
+                            </p>
+                        </div>
+
+                        {/* Social Links */}
+                        <div className="flex gap-3 flex-wrap">
+                            {socialLinks.map((social) => {
+                                const Icon = social.icon;
+                                const isExternal = !('isCV' in social);
+                                return (
+                                    <a
+                                        key={social.label}
+                                        href={social.href}
+                                        target={isExternal ? '_blank' : '_blank'}
+                                        rel="noopener noreferrer"
+                                        className="p-2 border-2 transition-all hover:opacity-70"
+                                        style={{ borderColor: 'rgb(var(--color-border))' }}
+                                        aria-label={social.label}
+                                        title={social.label}
                                     >
-                                        {/* Project Image */}
-                                        {project.image ? (
-                                            <div
-                                                className="aspect-video relative border-b-2 overflow-hidden"
-                                                style={{ borderColor: 'rgb(var(--color-border))' }}
-                                            >
-                                                <Image
-                                                    src={project.image}
-                                                    alt={project.title}
-                                                    fill
-                                                    className="object-cover group-hover:scale-105 transition-transform duration-500"
-                                                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                                                />
-                                            </div>
-                                        ) : (
-                                            <div
-                                                className="aspect-video flex items-center justify-center border-b-2"
+                                        <Icon className="w-4 h-4" />
+                                    </a>
+                                );
+                            })}
+                        </div>
+
+                        {/* Divider */}
+                        <div
+                            className="h-[2px]"
+                            style={{ backgroundColor: 'rgb(var(--color-border))' }}
+                        />
+
+                        {/* Tags */}
+                        <div>
+                            <h4 className="mb-3">Tags</h4>
+                            <ul className="space-y-2">
+                                {/* All posts option */}
+                                <li>
+                                    <button
+                                        onClick={() => { setSelectedTag(null); setActiveTab('blog'); }}
+                                        className={`text-sm no-underline flex justify-between items-center group w-full text-left ${selectedTag === null ? 'font-bold' : ''
+                                            }`}
+                                        style={{ color: 'rgb(var(--color-text-muted))' }}
+                                    >
+                                        <span className="group-hover:underline">All</span>
+                                        <span>({allPostsData.length})</span>
+                                    </button>
+                                </li>
+                                {allTags.map((tag) => (
+                                    <li key={tag.name}>
+                                        <button
+                                            onClick={() => { setSelectedTag(tag.name); setActiveTab('blog'); }}
+                                            className={`text-sm no-underline flex justify-between items-center group w-full text-left ${selectedTag === tag.name ? 'font-bold' : ''
+                                                }`}
+                                            style={{ color: 'rgb(var(--color-text-muted))' }}
+                                        >
+                                            <span className="group-hover:underline">{tag.name}</span>
+                                            <span>({tag.count})</span>
+                                        </button>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </aside>
+
+                    {/* ========== CENTER COLUMN ========== */}
+                    <div className="py-8 space-y-8 min-w-0">
+                        {/* About Me */}
+                        <section>
+                            <h2 className="mb-4" style={{ fontFamily: 'var(--font-serif)' }}>About Me</h2>
+                            <div className="prose prose-lg max-w-none">
+                                <div dangerouslySetInnerHTML={{ __html: aboutHtml }} />
+                            </div>
+                        </section>
+
+                        {/* Tech Stack - constrained to center column */}
+                        <TechStack />
+
+                        {/* Search Bar */}
+                        <div className="relative">
+                            <input
+                                type="text"
+                                placeholder="Search articles..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="w-full px-4 py-2 border-2 bg-transparent focus:outline-none transition-colors"
+                                style={{
+                                    borderColor: 'rgb(var(--color-border))',
+                                    backgroundColor: 'transparent'
+                                }}
+                            />
+                            <svg
+                                className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4"
+                                style={{ color: 'rgb(var(--color-text-muted))' }}
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                            >
+                                <circle cx="11" cy="11" r="8" />
+                                <path d="m21 21-4.3-4.3" />
+                            </svg>
+                        </div>
+
+                        {/* Tab Navigation */}
+                        <div
+                            className="flex gap-6 border-b-2"
+                            style={{ borderColor: 'rgb(var(--color-border))' }}
+                        >
+                            <button
+                                onClick={() => setActiveTab('blog')}
+                                className={`pb-3 text-sm uppercase tracking-wider transition-opacity relative ${activeTab === 'blog' ? 'opacity-100 font-bold' : 'opacity-60 hover:opacity-80'
+                                    }`}
+                                style={{
+                                    borderBottom: activeTab === 'blog' ? '2px solid rgb(var(--color-text))' : '2px solid transparent',
+                                    marginBottom: '-2px',
+                                }}
+                            >
+                                Blog
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('book')}
+                                className={`pb-3 text-sm uppercase tracking-wider transition-opacity relative ${activeTab === 'book' ? 'opacity-100 font-bold' : 'opacity-60 hover:opacity-80'
+                                    }`}
+                                style={{
+                                    borderBottom: activeTab === 'book' ? '2px solid rgb(var(--color-text))' : '2px solid transparent',
+                                    marginBottom: '-2px',
+                                }}
+                            >
+                                Book
+                            </button>
+                        </div>
+
+                        {/* Tab Content */}
+                        {activeTab === 'blog' && (
+                            <div className="space-y-6">
+                                {filteredPosts.length === 0 ? (
+                                    <p style={{ color: 'rgb(var(--color-text-muted))' }}>
+                                        No posts found matching your criteria.
+                                    </p>
+                                ) : (
+                                    filteredPosts.map((post) => (
+                                        <Link
+                                            key={post.id}
+                                            href={`/blog/${post.slug.join('/')}`}
+                                            className="no-underline block group"
+                                        >
+                                            <article
+                                                className="border-2 p-5 transition-all hover:shadow-lg"
                                                 style={{
                                                     borderColor: 'rgb(var(--color-border))',
-                                                    backgroundColor: 'rgb(var(--color-bg))'
+                                                    backgroundColor: 'rgb(var(--color-surface))'
                                                 }}
                                             >
-                                                <span
-                                                    className="text-4xl font-serif opacity-20"
-                                                    style={{ fontFamily: 'var(--font-serif)' }}
+                                                <div className="flex items-center gap-3 mb-2 flex-wrap">
+                                                    <time
+                                                        className="text-xs"
+                                                        style={{ color: 'rgb(var(--color-text-muted))' }}
+                                                    >
+                                                        {formatDate(post.date)}
+                                                    </time>
+                                                    {post.tags && post.tags.length > 0 && (
+                                                        <>
+                                                            <span
+                                                                className="text-xs"
+                                                                style={{ color: 'rgb(var(--color-text-muted))' }}
+                                                            >·</span>
+                                                            {post.tags.map((tag) => (
+                                                                <span
+                                                                    key={tag}
+                                                                    className="text-xs px-2 py-0.5 border"
+                                                                    style={{
+                                                                        color: 'rgb(var(--color-text-muted))',
+                                                                        borderColor: 'rgb(var(--color-text-muted))'
+                                                                    }}
+                                                                >
+                                                                    {tag}
+                                                                </span>
+                                                            ))}
+                                                        </>
+                                                    )}
+                                                </div>
+                                                <h3 className="text-[4px] leading-tight mb-2 group-hover:opacity-80 transition-opacity">
+                                                    {post.title}
+                                                </h3>
+                                                {post.excerpt && (
+                                                    <p
+                                                        className="text-sm mb-4 leading-relaxed"
+                                                        style={{ color: 'rgb(var(--color-text-muted))' }}
+                                                    >
+                                                        {post.excerpt}
+                                                    </p>
+                                                )}
+                                                <div
+                                                    className="flex items-center justify-between pt-3 border-t"
+                                                    style={{ borderColor: 'rgb(var(--color-text-muted))' }}
                                                 >
-                                                    ❧
-                                                </span>
-                                            </div>
-                                        )}
-                                        <div className="p-6 flex-1 flex flex-col">
+                                                    <span
+                                                        className="text-xs"
+                                                        style={{ color: 'rgb(var(--color-text-muted))' }}
+                                                    >
+                                                        {post.readTime}
+                                                    </span>
+                                                    <span
+                                                        className="text-xs border-b pb-0.5 hover:opacity-70 transition-opacity"
+                                                        style={{ borderColor: 'rgb(var(--color-border))' }}
+                                                    >
+                                                        READ ARTICLE →
+                                                    </span>
+                                                </div>
+                                            </article>
+                                        </Link>
+                                    ))
+                                )}
+                            </div>
+                        )}
+
+                        {activeTab === 'book' && (
+                            <div>
+                                {allBooksData.length === 0 ? (
+                                    <p style={{ color: 'rgb(var(--color-text-muted))' }}>
+                                        No books yet. Add markdown files to the <code>_books</code> folder.
+                                    </p>
+                                ) : (
+                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                        {allBooksData.map((book) => (
+                                            <Link
+                                                key={book.id}
+                                                href={`/books/${book.id}`}
+                                                className="group no-underline h-full"
+                                            >
+                                                <div
+                                                    className="border-2 overflow-hidden hover:shadow-lg transition-shadow h-full flex flex-col"
+                                                    style={{
+                                                        borderColor: 'rgb(var(--color-border))',
+                                                        backgroundColor: 'rgb(var(--color-surface))'
+                                                    }}
+                                                >
+                                                    {/* Book Cover - 2:3 aspect ratio */}
+                                                    <div
+                                                        className="aspect-[2/3] overflow-hidden border-b-2 flex-shrink-0 relative"
+                                                        style={{ borderColor: 'rgb(var(--color-border))' }}
+                                                    >
+                                                        <Image
+                                                            src={book.cover}
+                                                            alt={book.title}
+                                                            fill
+                                                            className="object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
+                                                            sizes="(max-width: 768px) 50vw, 33vw"
+                                                        />
+                                                    </div>
+                                                    {/* Book Info */}
+                                                    <div className="p-3 flex-1 flex flex-col">
+                                                        <h3
+                                                            className="text-[4px] leading-tight mb-1 group-hover:opacity-70 transition-opacity"
+                                                            style={{ fontFamily: 'var(--font-serif)' }}
+                                                        >
+                                                            {book.title}
+                                                        </h3>
+                                                        <p
+                                                            className="text-xs mb-1"
+                                                            style={{ color: 'rgb(var(--color-text-muted))' }}
+                                                        >
+                                                            by {book.author}
+                                                        </p>
+                                                        {book.rating && (
+                                                            <div
+                                                                className="text-xs mt-auto"
+                                                                style={{ color: 'rgb(var(--color-text-muted))' }}
+                                                            >
+                                                                {renderRating(book.rating)}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </Link>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* ========== RIGHT SIDEBAR ========== */}
+                    <aside className="lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto lg:py-8 py-6">
+                        <div>
+                            <div className="flex items-center gap-3 mb-6">
+                                <h4>Recent Projects</h4>
+                                <div
+                                    className="flex-1 h-[2px]"
+                                    style={{ backgroundColor: 'rgb(var(--color-border))' }}
+                                />
+                            </div>
+
+                            <div className="space-y-4">
+                                {spotlights.map((project) => (
+                                    <a
+                                        key={project.id}
+                                        href={project.link}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="no-underline block group"
+                                    >
+                                        <div
+                                            className="border-2 p-4 transition-all hover:shadow-lg"
+                                            style={{
+                                                borderColor: 'rgb(var(--color-border))',
+                                                backgroundColor: 'rgb(var(--color-surface))'
+                                            }}
+                                        >
                                             <span
-                                                className="text-xs uppercase tracking-wider mb-2"
+                                                className="text-xs uppercase tracking-wider mb-2 block"
                                                 style={{ color: 'rgb(var(--color-text-muted))' }}
                                             >
                                                 {project.category || 'Project'}
                                             </span>
                                             <h3
-                                                className="text-lg mb-2 group-hover:opacity-80 transition-opacity"
+                                                className="text-sm mb-2 group-hover:opacity-80 transition-opacity"
                                                 style={{ fontFamily: 'var(--font-serif)' }}
                                             >
                                                 {project.title}
                                             </h3>
                                             <p
-                                                className="text-sm leading-relaxed mb-4 flex-1 font-sans"
+                                                className="text-xs leading-relaxed mb-3"
                                                 style={{ color: 'rgb(var(--color-text-muted))' }}
                                             >
                                                 {project.description}
                                             </p>
                                             <span
-                                                className="inline-flex items-center gap-2 text-xs uppercase tracking-wider"
+                                                className="inline-flex items-center gap-1 text-xs uppercase tracking-wider"
                                                 style={{ color: 'rgb(var(--color-text-muted))' }}
                                             >
                                                 View Project
                                                 <FiExternalLink className="w-3 h-3" />
                                             </span>
                                         </div>
-                                    </article>
-                                </a>
-                            ))}
+                                    </a>
+                                ))}
+                            </div>
                         </div>
-                    </section>
-                )}
-
-                {/* Recent Writings Grid */}
-                <section className="mb-20">
-                    <div className="flex items-center gap-4 mb-8">
-                        <h2 style={{ fontFamily: 'var(--font-serif)' }}>Recent Writings</h2>
-                        <div
-                            className="flex-1 h-[2px]"
-                            style={{ backgroundColor: 'rgb(var(--color-border))' }}
-                        />
-                        <Link
-                            href="/blog"
-                            className="text-sm uppercase tracking-wider no-underline hover:opacity-70 transition-opacity"
-                            style={{ color: 'rgb(var(--color-text-muted))' }}
-                        >
-                            View All →
-                        </Link>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        {recentPosts.map((post) => (
-                            <Link
-                                key={post.id}
-                                href={`/blog/${post.slug.join('/')}`}
-                                className="no-underline block group"
-                            >
-                                <article
-                                    className="border-2 p-6 h-full transition-all hover:shadow-lg"
-                                    style={{
-                                        borderColor: 'rgb(var(--color-border))',
-                                        backgroundColor: 'rgb(var(--color-surface))'
-                                    }}
-                                >
-                                    <div className="flex items-center gap-3 mb-3">
-                                        <span
-                                            className="text-xs uppercase tracking-wider"
-                                            style={{ color: 'rgb(var(--color-text-muted))' }}
-                                        >
-                                            {post.category || 'Post'}
-                                        </span>
-                                        <span style={{ color: 'rgb(var(--color-text-muted))' }}>·</span>
-                                        <time
-                                            className="text-xs"
-                                            style={{ color: 'rgb(var(--color-text-muted))' }}
-                                        >
-                                            {formatDate(post.date)}
-                                        </time>
-                                    </div>
-                                    <h3
-                                        className="text-xl mb-3 group-hover:opacity-80 transition-opacity"
-                                        style={{ fontFamily: 'var(--font-serif)' }}
-                                    >
-                                        {post.title}
-                                    </h3>
-                                    {post.excerpt && (
-                                        <p
-                                            className="text-sm leading-relaxed"
-                                            style={{ color: 'rgb(var(--color-text-muted))' }}
-                                        >
-                                            {post.excerpt}
-                                        </p>
-                                    )}
-                                    <div className="mt-4 pt-4 border-t" style={{ borderColor: 'rgb(var(--color-text-muted))' }}>
-                                        <span className="text-xs" style={{ color: 'rgb(var(--color-text-muted))' }}>
-                                            {post.readTime}
-                                        </span>
-                                    </div>
-                                </article>
-                            </Link>
-                        ))}
-                    </div>
-                </section>
+                    </aside>
+                </div>
             </div>
         </>
     );
@@ -266,12 +481,35 @@ const Home: NextPage<HomeProps> = ({ allPostsData, spotlights }) => {
 export default Home;
 
 export const getStaticProps: GetStaticProps = async () => {
+    // Blog data
     const allPostsData = getSortedPostsData();
+    const allTags = getAllTags();
+
+    // Book data
+    const allBooksData = getSortedBooksData();
+
+    // Spotlight projects
     const spotlights = getSpotlightProjects();
+
+    // About content from _content/about.md
+    const contentDirectory = path.join(process.cwd(), '_content');
+    const aboutPath = path.join(contentDirectory, 'about.md');
+    let aboutHtml = '';
+
+    if (fs.existsSync(aboutPath)) {
+        const fileContents = fs.readFileSync(aboutPath, 'utf8');
+        const { content } = matter(fileContents);
+        const processedContent = await remark().use(html).process(content);
+        aboutHtml = processedContent.toString();
+    }
+
     return {
         props: {
             allPostsData,
+            allTags,
+            allBooksData,
             spotlights,
+            aboutHtml,
         },
     };
 };

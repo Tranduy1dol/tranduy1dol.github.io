@@ -125,12 +125,12 @@ const Post: NextPage<PostProps> = ({ postData }) => {
             <div className="max-w-7xl mx-auto px-6 py-12">
                 {/* Back Link */}
                 <Link
-                    href="/blog"
+                    href="/"
                     className="inline-flex items-center gap-2 text-sm no-underline mb-12 hover:opacity-70 transition-opacity"
                     style={{ color: 'rgb(var(--color-text-muted))' }}
                 >
                     <FiArrowLeft className="w-4 h-4" />
-                    Back to all posts
+                    Back to home
                 </Link>
 
                 <div className="grid grid-cols-1 lg:grid-cols-[60px_1fr_250px] gap-12">
@@ -206,18 +206,12 @@ const Post: NextPage<PostProps> = ({ postData }) => {
                     <article className="max-w-3xl">
                         {/* Article Header */}
                         <header className="mb-8">
-                            <div className="flex items-center gap-3 mb-4">
-                                <h4 style={{ color: 'rgb(var(--color-text-muted))' }}>
-                                    {postData.category || 'POST'}
-                                </h4>
-                                <span style={{ color: 'rgb(var(--color-text-muted))' }}>—</span>
-                                <time
-                                    className="text-sm"
-                                    style={{ color: 'rgb(var(--color-text-muted))' }}
-                                >
-                                    {formatDate(postData.date)}
-                                </time>
-                            </div>
+                            <time
+                                className="text-sm mb-4 block"
+                                style={{ color: 'rgb(var(--color-text-muted))' }}
+                            >
+                                {formatDate(postData.date)}
+                            </time>
                             <h1 className="mb-6">{postData.title}</h1>
                             {postData.excerpt && (
                                 <p

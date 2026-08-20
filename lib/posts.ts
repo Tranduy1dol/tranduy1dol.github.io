@@ -34,7 +34,6 @@ export type PostData = {
     date: string;
     title: string;
     excerpt?: string;
-    category?: string;
     tags?: string[];
     readTime?: string;
     contentHtml?: string;
@@ -123,7 +122,7 @@ function getAllMarkdownFiles(dir: string, tag: string | null = null): Array<{ fi
 export function getSortedPostsData(): PostData[] {
     const allFiles = getAllMarkdownFiles(postsDirectory);
 
-    const allPostsData = allFiles.map(({ filePath, tag }) => {
+    const allPostsData = allFiles.map(({ filePath }) => {
         // Get id from filename
         const fileName = path.basename(filePath);
         const id = fileName.replace(/\.md$/, '');
@@ -140,9 +139,8 @@ export function getSortedPostsData(): PostData[] {
         // Calculate read time if not provided
         const readTime = matterResult.data.readTime || calculateReadTime(matterResult.content);
 
-        // Build tags array - folder tag + any frontmatter tags
+        // Tags from frontmatter only
         const tags: string[] = [];
-        if (tag) tags.push(tag);
         if (matterResult.data.tags) {
             const frontmatterTags = Array.isArray(matterResult.data.tags)
                 ? matterResult.data.tags
@@ -165,7 +163,6 @@ export function getSortedPostsData(): PostData[] {
             date: dateStr as string,
             title: matterResult.data.title as string,
             excerpt: matterResult.data.excerpt as string | undefined,
-            category: matterResult.data.category as string | undefined,
         };
     });
 
@@ -251,11 +248,6 @@ export async function getPostData(slug: string[]): Promise<PostData> {
     const fileName = path.basename(filePath);
     const id = fileName.replace(/\.md$/, '');
 
-    // Get tag from folder if in subdirectory
-    const relativePath = path.relative(postsDirectory, filePath);
-    const parts = relativePath.split(path.sep);
-    const tag = parts.length > 1 ? parts[0] : null;
-
     // Use gray-matter to parse the post metadata section
     const matterResult = matter(fileContents);
 
@@ -283,9 +275,8 @@ export async function getPostData(slug: string[]): Promise<PostData> {
     // Calculate read time if not provided
     const readTime = matterResult.data.readTime || calculateReadTime(matterResult.content);
 
-    // Build tags array
+    // Tags from frontmatter only
     const tags: string[] = [];
-    if (tag) tags.push(tag);
     if (matterResult.data.tags) {
         const frontmatterTags = Array.isArray(matterResult.data.tags)
             ? matterResult.data.tags
@@ -320,6 +311,5 @@ export async function getPostData(slug: string[]): Promise<PostData> {
         date: dateStr as string,
         title: matterResult.data.title as string,
         excerpt: matterResult.data.excerpt as string | undefined,
-        category: matterResult.data.category as string | undefined,
     };
 }

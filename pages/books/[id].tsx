@@ -36,12 +36,12 @@ const BookDetail: NextPage<BookDetailProps> = ({ bookData }) => {
 
             {/* Back Link */}
             <Link
-                href="/book"
+                href="/"
                 className="inline-flex items-center gap-2 text-sm no-underline mb-8 hover:opacity-70 transition-opacity"
                 style={{ color: 'rgb(var(--color-text-muted))' }}
             >
                 <FiArrowLeft className="w-4 h-4" />
-                Back to all books
+                Back to home
             </Link>
 
             <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-12">
