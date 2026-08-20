@@ -2,6 +2,10 @@
 title: "Redis persistence: từ 'mất data khi restart' đến AOF và RDB"
 date: 2026-05-07
 excerpt: Mình dùng Redis làm cart storage trong e-commerce project. Nhanh thì nhanh thật, nhưng restart là mất hết. Và đây là những gì mình tìm hiểu được để không mất data.
+tags:
+  - backend
+  - software-engineer
+  - redis
 ---
 
 ## Đơn giản là vì Redis nhanh hơn

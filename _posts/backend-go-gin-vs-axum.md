@@ -2,6 +2,10 @@
 title: Backend Go với Gin — những gì mình học được khi so sánh với Axum
 date: 2026-05-10
 excerpt: Cùng một bài toán, nhưng Go (Gin) và Rust (Axum) có sự khác nhau rõ rệt.
+tags:
+  - software-engineer
+  - backend
+  - golang
 ---
 ## Cùng bài toán, khác ngôn ngữ
 

@@ -1,7 +1,8 @@
 ---
 title: ""
-date: {{date}}
+date:
+  "{ date }":
 excerpt: ""
-category: ""
+tags: ""
 ---
 ## skeleton

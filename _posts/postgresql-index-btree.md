@@ -2,6 +2,11 @@
 title: Mình không trả lời được câu hỏi phỏng vấn "Index trong Posgres hoạt động thế nào?"
 date: 2026-05-07
 excerpt: Biết index sẽ giúp đọc data nhanh thôi là chưa đủ. Mình cần tìm hiểu index giúp đọc data như thế nào
+tags:
+  - database
+  - backend
+  - software-engineer
+  - postgresql
 ---
 
 ## Câu hỏi phỏng vấn tôi không trả lời được
