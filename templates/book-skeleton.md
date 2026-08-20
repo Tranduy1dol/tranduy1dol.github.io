@@ -5,4 +5,5 @@ cover:
 rating:
 dateRead:
 status:
+tags:
 ---
