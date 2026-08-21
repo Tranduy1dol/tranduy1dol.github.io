@@ -109,6 +109,10 @@ function extractHeadings(content: string): Heading[] {
 
 // Recursively get all markdown files with their tag (folder name)
 function getAllMarkdownFiles(dir: string, tag: string | null = null): Array<{ filePath: string; tag: string | null }> {
+    if (!fs.existsSync(dir)) {
+        return [];
+    }
+
     const entries = fs.readdirSync(dir, { withFileTypes: true });
     const files: Array<{ filePath: string; tag: string | null }> = [];
 
