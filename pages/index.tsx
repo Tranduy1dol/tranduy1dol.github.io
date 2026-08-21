@@ -524,21 +524,17 @@ export const getStaticProps: GetStaticProps = async () => {
     const aboutEnPath = path.join(contentDirectory, 'about.en.md');
     const aboutFallbackPath = path.join(contentDirectory, 'about.md');
 
-    async function loadAboutHtml(filePath: string): Promise<string> {
-        if (!fs.existsSync(filePath)) return '';
+    async function loadAboutHtml(filePath: string): Promise<string | null> {
+        if (!fs.existsSync(filePath)) return null;
         const fileContents = fs.readFileSync(filePath, 'utf8');
         const { content } = matter(fileContents);
         const processedContent = await remark().use(html).process(content);
         return processedContent.toString();
     }
 
-    let aboutVnHtml = await loadAboutHtml(aboutVnPath);
-    let aboutEnHtml = await loadAboutHtml(aboutEnPath);
+    const aboutVnHtml = await loadAboutHtml(aboutVnPath);
+    const aboutEnHtml = await loadAboutHtml(aboutEnPath);
     const aboutFallbackHtml = await loadAboutHtml(aboutFallbackPath);
-
-    // Apply fallback logic
-    if (!aboutVnHtml) aboutVnHtml = aboutFallbackHtml || aboutEnHtml;
-    if (!aboutEnHtml) aboutEnHtml = aboutFallbackHtml || aboutVnHtml;
 
     return {
         props: {
@@ -547,8 +543,8 @@ export const getStaticProps: GetStaticProps = async () => {
             allBooksData,
             spotlights,
             aboutHtml: {
-                vn: aboutVnHtml,
-                en: aboutEnHtml,
+                vn: aboutVnHtml ?? aboutFallbackHtml ?? aboutEnHtml ?? '',
+                en: aboutEnHtml ?? aboutFallbackHtml ?? aboutVnHtml ?? '',
             },
         },
     };
