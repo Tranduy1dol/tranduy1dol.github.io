@@ -3,10 +3,11 @@ import Head from 'next/head';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
-import { getSortedPostsData, getAllTags, PostData, TagCount } from '@/lib/posts';
-import { getSortedBooksData, BookData } from '@/lib/books';
-import { getSpotlightProjects, SpotlightData } from '@/lib/spotlight';
+import { getSortedPostsData, getAllTags, BilingualPostData, TagCount } from '@/lib/posts';
+import { getSortedBooksData, BilingualBookData } from '@/lib/books';
+import { getSpotlightProjects, BilingualSpotlightData } from '@/lib/spotlight';
 import { TechStack } from '@/components/TechStack';
+import { useLanguage } from '@/lib/LanguageContext';
 import { FiGithub, FiTwitter, FiLinkedin, FiMail, FiDownload, FiExternalLink } from 'react-icons/fi';
 
 import fs from 'fs';
@@ -24,11 +25,11 @@ const socialLinks = [
 ];
 
 type HomeProps = {
-    allPostsData: PostData[];
+    allPostsData: BilingualPostData[];
     allTags: TagCount[];
-    allBooksData: BookData[];
-    spotlights: SpotlightData[];
-    aboutHtml: string;
+    allBooksData: BilingualBookData[];
+    spotlights: BilingualSpotlightData[];
+    aboutHtml: { vn: string; en: string };
 };
 
 type ActiveTab = 'blog' | 'book';
@@ -37,6 +38,7 @@ const Home: NextPage<HomeProps> = ({ allPostsData, allTags, allBooksData, spotli
     const [activeTab, setActiveTab] = useState<ActiveTab>('blog');
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedTag, setSelectedTag] = useState<string | null>(null);
+    const { language } = useLanguage();
 
     const formatDate = (dateStr: string) => {
         const date = new Date(dateStr);
@@ -48,13 +50,14 @@ const Home: NextPage<HomeProps> = ({ allPostsData, allTags, allBooksData, spotli
     };
 
     // Filter posts based on search and selected tag
-    const filteredPosts = allPostsData.filter((post) => {
+    const filteredPosts = allPostsData.filter((bilingualPost) => {
+        const post = bilingualPost[language];
         const matchesSearch = searchQuery === '' ||
             post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
             (post.excerpt && post.excerpt.toLowerCase().includes(searchQuery.toLowerCase()));
 
         const matchesTag = selectedTag === null ||
-            (post.tags && post.tags.includes(selectedTag));
+            (bilingualPost.tags && bilingualPost.tags.includes(selectedTag));
 
         return matchesSearch && matchesTag;
     });
@@ -79,7 +82,7 @@ const Home: NextPage<HomeProps> = ({ allPostsData, allTags, allBooksData, spotli
     return (
         <>
             <Head>
-                <title>tranduy1dol - Code Alchemist</title>
+                <title>tranduy1dol - Software Engineer</title>
                 <meta name="description" content="Transmuting ideas into high-performance Rust APIs, distributed systems, and Zero-Knowledge solutions." />
             </Head>
 
@@ -121,14 +124,19 @@ const Home: NextPage<HomeProps> = ({ allPostsData, allTags, allBooksData, spotli
                                 className="text-sm uppercase tracking-wider mb-3"
                                 style={{ color: 'rgb(var(--color-text-muted))' }}
                             >
-                                Code Alchemist
+                              Software Engineer
                             </p>
                             <p
-                                className="text-sm leading-relaxed"
+                                className="text-sm leading-relaxed italic"
                                 style={{ color: 'rgb(var(--color-text-muted))' }}
                             >
-                                Transmuting ideas into Rust APIs &amp; ZK sorcery.
-                                Based in Hanoi, Vietnam 🇻🇳
+                                “A man is as unhappy as he has convinced himself he is.”
+                            </p>
+                            <p
+                                className="text-xs mt-2 uppercase tracking-wider"
+                                style={{ color: 'rgb(var(--color-text-muted))' }}
+                            >
+                                — Seneca
                             </p>
                         </div>
 
@@ -199,7 +207,7 @@ const Home: NextPage<HomeProps> = ({ allPostsData, allTags, allBooksData, spotli
                         <section>
                             <h2 className="mb-4" style={{ fontFamily: 'var(--font-serif)' }}>About Me</h2>
                             <div className="prose prose-lg max-w-none">
-                                <div dangerouslySetInnerHTML={{ __html: aboutHtml }} />
+                                <div dangerouslySetInnerHTML={{ __html: aboutHtml[language] }} />
                             </div>
                         </section>
 
@@ -272,78 +280,81 @@ const Home: NextPage<HomeProps> = ({ allPostsData, allTags, allBooksData, spotli
                                         No posts found matching your criteria.
                                     </p>
                                 ) : (
-                                    filteredPosts.map((post) => (
-                                        <Link
-                                            key={post.id}
-                                            href={`/blog/${post.slug.join('/')}`}
-                                            className="no-underline block group"
-                                        >
-                                            <article
-                                                className="border-2 p-5 transition-all hover:shadow-lg"
-                                                style={{
-                                                    borderColor: 'rgb(var(--color-border))',
-                                                    backgroundColor: 'rgb(var(--color-surface))'
-                                                }}
+                                    filteredPosts.map((bilingualPost) => {
+                                        const post = bilingualPost[language];
+                                        return (
+                                            <Link
+                                                key={post.id}
+                                                href={`/blog/${bilingualPost.slug.join('/')}`}
+                                                className="no-underline block group"
                                             >
-                                                <div className="flex items-center gap-3 mb-2 flex-wrap">
-                                                    <time
-                                                        className="text-xs"
-                                                        style={{ color: 'rgb(var(--color-text-muted))' }}
-                                                    >
-                                                        {formatDate(post.date)}
-                                                    </time>
-                                                    {post.tags && post.tags.length > 0 && (
-                                                        <>
-                                                            <span
-                                                                className="text-xs"
-                                                                style={{ color: 'rgb(var(--color-text-muted))' }}
-                                                            >·</span>
-                                                            {post.tags.map((tag) => (
-                                                                <span
-                                                                    key={tag}
-                                                                    className="text-xs px-2 py-0.5 border"
-                                                                    style={{
-                                                                        color: 'rgb(var(--color-text-muted))',
-                                                                        borderColor: 'rgb(var(--color-text-muted))'
-                                                                    }}
-                                                                >
-                                                                    {tag}
-                                                                </span>
-                                                            ))}
-                                                        </>
-                                                    )}
-                                                </div>
-                                                <h3 className="text-[4px] leading-tight mb-2 group-hover:opacity-80 transition-opacity">
-                                                    {post.title}
-                                                </h3>
-                                                {post.excerpt && (
-                                                    <p
-                                                        className="text-sm mb-4 leading-relaxed"
-                                                        style={{ color: 'rgb(var(--color-text-muted))' }}
-                                                    >
-                                                        {post.excerpt}
-                                                    </p>
-                                                )}
-                                                <div
-                                                    className="flex items-center justify-between pt-3 border-t"
-                                                    style={{ borderColor: 'rgb(var(--color-text-muted))' }}
+                                                <article
+                                                    className="border-2 p-5 transition-all hover:shadow-lg"
+                                                    style={{
+                                                        borderColor: 'rgb(var(--color-border))',
+                                                        backgroundColor: 'rgb(var(--color-surface))'
+                                                    }}
                                                 >
-                                                    <span
-                                                        className="text-xs"
-                                                        style={{ color: 'rgb(var(--color-text-muted))' }}
+                                                    <div className="flex items-center gap-3 mb-2 flex-wrap">
+                                                        <time
+                                                            className="text-xs"
+                                                            style={{ color: 'rgb(var(--color-text-muted))' }}
+                                                        >
+                                                            {formatDate(bilingualPost.date)}
+                                                        </time>
+                                                        {bilingualPost.tags && bilingualPost.tags.length > 0 && (
+                                                            <>
+                                                                <span
+                                                                    className="text-xs"
+                                                                    style={{ color: 'rgb(var(--color-text-muted))' }}
+                                                                >·</span>
+                                                                {bilingualPost.tags.map((tag) => (
+                                                                    <span
+                                                                        key={tag}
+                                                                        className="text-xs px-2 py-0.5 border"
+                                                                        style={{
+                                                                            color: 'rgb(var(--color-text-muted))',
+                                                                            borderColor: 'rgb(var(--color-text-muted))'
+                                                                        }}
+                                                                    >
+                                                                        {tag}
+                                                                    </span>
+                                                                ))}
+                                                            </>
+                                                        )}
+                                                    </div>
+                                                    <h3 className="text-xl leading-tight mb-2 group-hover:opacity-80 transition-opacity">
+                                                        {post.title}
+                                                    </h3>
+                                                    {post.excerpt && (
+                                                        <p
+                                                            className="text-sm mb-4 leading-relaxed"
+                                                            style={{ color: 'rgb(var(--color-text-muted))' }}
+                                                        >
+                                                            {post.excerpt}
+                                                        </p>
+                                                    )}
+                                                    <div
+                                                        className="flex items-center justify-between pt-3 border-t"
+                                                        style={{ borderColor: 'rgb(var(--color-text-muted))' }}
                                                     >
-                                                        {post.readTime}
-                                                    </span>
-                                                    <span
-                                                        className="text-xs border-b pb-0.5 hover:opacity-70 transition-opacity"
-                                                        style={{ borderColor: 'rgb(var(--color-border))' }}
-                                                    >
-                                                        READ ARTICLE →
-                                                    </span>
-                                                </div>
-                                            </article>
-                                        </Link>
-                                    ))
+                                                        <span
+                                                            className="text-xs"
+                                                            style={{ color: 'rgb(var(--color-text-muted))' }}
+                                                        >
+                                                            {post.readTime}
+                                                        </span>
+                                                        <span
+                                                            className="text-xs border-b pb-0.5 hover:opacity-70 transition-opacity"
+                                                            style={{ borderColor: 'rgb(var(--color-border))' }}
+                                                        >
+                                                            READ ARTICLE →
+                                                        </span>
+                                                    </div>
+                                                </article>
+                                            </Link>
+                                        );
+                                    })
                                 )}
                             </div>
                         )}
@@ -356,58 +367,61 @@ const Home: NextPage<HomeProps> = ({ allPostsData, allTags, allBooksData, spotli
                                     </p>
                                 ) : (
                                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                                        {allBooksData.map((book) => (
-                                            <Link
-                                                key={book.id}
-                                                href={`/books/${book.id}`}
-                                                className="group no-underline h-full"
-                                            >
-                                                <div
-                                                    className="border-2 overflow-hidden hover:shadow-lg transition-shadow h-full flex flex-col"
-                                                    style={{
-                                                        borderColor: 'rgb(var(--color-border))',
-                                                        backgroundColor: 'rgb(var(--color-surface))'
-                                                    }}
+                                        {allBooksData.map((bilingualBook) => {
+                                            const book = bilingualBook[language];
+                                            return (
+                                                <Link
+                                                    key={bilingualBook.id}
+                                                    href={`/books/${bilingualBook.id}`}
+                                                    className="group no-underline h-full"
                                                 >
-                                                    {/* Book Cover - 2:3 aspect ratio */}
                                                     <div
-                                                        className="aspect-[2/3] overflow-hidden border-b-2 flex-shrink-0 relative"
-                                                        style={{ borderColor: 'rgb(var(--color-border))' }}
+                                                        className="border-2 overflow-hidden hover:shadow-lg transition-shadow h-full flex flex-col"
+                                                        style={{
+                                                            borderColor: 'rgb(var(--color-border))',
+                                                            backgroundColor: 'rgb(var(--color-surface))'
+                                                        }}
                                                     >
-                                                        <Image
-                                                            src={book.cover}
-                                                            alt={book.title}
-                                                            fill
-                                                            className="object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
-                                                            sizes="(max-width: 768px) 50vw, 33vw"
-                                                        />
-                                                    </div>
-                                                    {/* Book Info */}
-                                                    <div className="p-3 flex-1 flex flex-col">
-                                                        <h3
-                                                            className="text-[4px] leading-tight mb-1 group-hover:opacity-70 transition-opacity"
-                                                            style={{ fontFamily: 'var(--font-serif)' }}
+                                                        {/* Book Cover - 2:3 aspect ratio */}
+                                                        <div
+                                                            className="aspect-[2/3] overflow-hidden border-b-2 flex-shrink-0 relative"
+                                                            style={{ borderColor: 'rgb(var(--color-border))' }}
                                                         >
-                                                            {book.title}
-                                                        </h3>
-                                                        <p
-                                                            className="text-xs mb-1"
-                                                            style={{ color: 'rgb(var(--color-text-muted))' }}
-                                                        >
-                                                            by {book.author}
-                                                        </p>
-                                                        {book.rating && (
-                                                            <div
-                                                                className="text-xs mt-auto"
+                                                            <Image
+                                                                src={bilingualBook.cover}
+                                                                alt={book.title}
+                                                                fill
+                                                                className="object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
+                                                                sizes="(max-width: 768px) 50vw, 33vw"
+                                                            />
+                                                        </div>
+                                                        {/* Book Info */}
+                                                        <div className="p-3 flex-1 flex flex-col">
+                                                            <h3
+                                                                className="text-sm leading-tight mb-1 group-hover:opacity-70 transition-opacity"
+                                                                style={{ fontFamily: 'var(--font-serif)' }}
+                                                            >
+                                                                {book.title}
+                                                            </h3>
+                                                            <p
+                                                                className="text-xs mb-1"
                                                                 style={{ color: 'rgb(var(--color-text-muted))' }}
                                                             >
-                                                                {renderRating(book.rating)}
-                                                            </div>
-                                                        )}
+                                                                by {book.author}
+                                                            </p>
+                                                            {bilingualBook.rating && (
+                                                                <div
+                                                                    className="text-xs mt-auto"
+                                                                    style={{ color: 'rgb(var(--color-text-muted))' }}
+                                                                >
+                                                                    {renderRating(bilingualBook.rating)}
+                                                                </div>
+                                                            )}
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </Link>
-                                        ))}
+                                                </Link>
+                                            );
+                                        })}
                                     </div>
                                 )}
                             </div>
@@ -426,59 +440,62 @@ const Home: NextPage<HomeProps> = ({ allPostsData, allTags, allBooksData, spotli
                             </div>
 
                             <div className="space-y-4">
-                                {spotlights.map((project) => (
-                                    <a
-                                        key={project.id}
-                                        href={project.link}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="no-underline block group"
-                                    >
-                                        <div
-                                            className="border-2 overflow-hidden transition-all hover:shadow-lg"
-                                            style={{
-                                                borderColor: 'rgb(var(--color-border))',
-                                                backgroundColor: 'rgb(var(--color-surface))'
-                                            }}
+                                {spotlights.map((bilingualProject) => {
+                                    const project = bilingualProject[language];
+                                    return (
+                                        <a
+                                            key={bilingualProject.id}
+                                            href={bilingualProject.link}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="no-underline block group"
                                         >
-                                            {project.image && (
-                                                <div
-                                                    className="aspect-video overflow-hidden border-b-2 relative"
-                                                    style={{ borderColor: 'rgb(var(--color-border))' }}
-                                                >
-                                                    <Image
-                                                        src={project.image}
-                                                        alt={project.title}
-                                                        fill
-                                                        className="object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
-                                                        sizes="(max-width: 1024px) 100vw, 33vw"
-                                                    />
+                                            <div
+                                                className="border-2 overflow-hidden transition-all hover:shadow-lg"
+                                                style={{
+                                                    borderColor: 'rgb(var(--color-border))',
+                                                    backgroundColor: 'rgb(var(--color-surface))'
+                                                }}
+                                            >
+                                                {bilingualProject.image && (
+                                                    <div
+                                                        className="aspect-video overflow-hidden border-b-2 relative"
+                                                        style={{ borderColor: 'rgb(var(--color-border))' }}
+                                                    >
+                                                        <Image
+                                                            src={bilingualProject.image}
+                                                            alt={project.title}
+                                                            fill
+                                                            className="object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
+                                                            sizes="(max-width: 1024px) 100vw, 33vw"
+                                                        />
+                                                    </div>
+                                                )}
+                                                <div className="p-4">
+                                                    <h3
+                                                        className="text-sm mb-2 group-hover:opacity-80 transition-opacity"
+                                                        style={{ fontFamily: 'var(--font-serif)' }}
+                                                    >
+                                                        {project.title}
+                                                    </h3>
+                                                    <p
+                                                        className="text-xs leading-relaxed mb-3"
+                                                        style={{ color: 'rgb(var(--color-text-muted))' }}
+                                                    >
+                                                        {project.description}
+                                                    </p>
+                                                    <span
+                                                        className="inline-flex items-center gap-1 text-xs uppercase tracking-wider"
+                                                        style={{ color: 'rgb(var(--color-text-muted))' }}
+                                                    >
+                                                        View Project
+                                                        <FiExternalLink className="w-3 h-3" />
+                                                    </span>
                                                 </div>
-                                            )}
-                                            <div className="p-4">
-                                                <h3
-                                                    className="text-sm mb-2 group-hover:opacity-80 transition-opacity"
-                                                    style={{ fontFamily: 'var(--font-serif)' }}
-                                                >
-                                                    {project.title}
-                                                </h3>
-                                                <p
-                                                    className="text-xs leading-relaxed mb-3"
-                                                    style={{ color: 'rgb(var(--color-text-muted))' }}
-                                                >
-                                                    {project.description}
-                                                </p>
-                                                <span
-                                                    className="inline-flex items-center gap-1 text-xs uppercase tracking-wider"
-                                                    style={{ color: 'rgb(var(--color-text-muted))' }}
-                                                >
-                                                    View Project
-                                                    <FiExternalLink className="w-3 h-3" />
-                                                </span>
                                             </div>
-                                        </div>
-                                    </a>
-                                ))}
+                                        </a>
+                                    );
+                                })}
                             </div>
                         </div>
                     </aside>
@@ -501,17 +518,27 @@ export const getStaticProps: GetStaticProps = async () => {
     // Spotlight projects
     const spotlights = getSpotlightProjects();
 
-    // About content from _content/about.md
+    // About content — load bilingual variants
     const contentDirectory = path.join(process.cwd(), '_content');
-    const aboutPath = path.join(contentDirectory, 'about.md');
-    let aboutHtml = '';
+    const aboutVnPath = path.join(contentDirectory, 'about.vn.md');
+    const aboutEnPath = path.join(contentDirectory, 'about.en.md');
+    const aboutFallbackPath = path.join(contentDirectory, 'about.md');
 
-    if (fs.existsSync(aboutPath)) {
-        const fileContents = fs.readFileSync(aboutPath, 'utf8');
+    async function loadAboutHtml(filePath: string): Promise<string> {
+        if (!fs.existsSync(filePath)) return '';
+        const fileContents = fs.readFileSync(filePath, 'utf8');
         const { content } = matter(fileContents);
         const processedContent = await remark().use(html).process(content);
-        aboutHtml = processedContent.toString();
+        return processedContent.toString();
     }
+
+    let aboutVnHtml = await loadAboutHtml(aboutVnPath);
+    let aboutEnHtml = await loadAboutHtml(aboutEnPath);
+    const aboutFallbackHtml = await loadAboutHtml(aboutFallbackPath);
+
+    // Apply fallback logic
+    if (!aboutVnHtml) aboutVnHtml = aboutFallbackHtml || aboutEnHtml;
+    if (!aboutEnHtml) aboutEnHtml = aboutFallbackHtml || aboutVnHtml;
 
     return {
         props: {
@@ -519,7 +546,10 @@ export const getStaticProps: GetStaticProps = async () => {
             allTags,
             allBooksData,
             spotlights,
-            aboutHtml,
+            aboutHtml: {
+                vn: aboutVnHtml,
+                en: aboutEnHtml,
+            },
         },
     };
 };

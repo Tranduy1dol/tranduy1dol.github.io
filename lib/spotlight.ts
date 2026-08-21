@@ -13,7 +13,40 @@ export type SpotlightData = {
     order?: number;
 };
 
-export function getSpotlightProjects(): SpotlightData[] {
+export type BilingualSpotlightData = {
+    id: string;
+    link: string;
+    image?: string;
+    order?: number;
+    vn: SpotlightData;
+    en: SpotlightData;
+};
+
+export function getBaseId(fileName: string): string {
+    return fileName.replace(/\.vn\.md$/, '').replace(/\.en\.md$/, '').replace(/\.md$/, '');
+}
+
+function parseSpotlightFile(fullPath: string, id: string): SpotlightData | null {
+    if (!fs.existsSync(fullPath)) return null;
+    const fileContents = fs.readFileSync(fullPath, 'utf8');
+    const matterResult = matter(fileContents);
+
+    const project: SpotlightData = {
+        id,
+        title: matterResult.data.title,
+        description: matterResult.data.description,
+        link: matterResult.data.link,
+        order: matterResult.data.order || 0,
+    };
+
+    if (matterResult.data.image) {
+        project.image = matterResult.data.image;
+    }
+
+    return project;
+}
+
+export function getSpotlightProjects(): BilingualSpotlightData[] {
     // Ensure directory exists
     if (!fs.existsSync(spotlightDirectory)) {
         fs.mkdirSync(spotlightDirectory, { recursive: true });
@@ -27,26 +60,29 @@ export function getSpotlightProjects(): SpotlightData[] {
         return [];
     }
 
-    const allProjects = mdFiles.map((fileName) => {
-        const id = fileName.replace(/\.md$/, '');
-        const fullPath = path.join(spotlightDirectory, fileName);
-        const fileContents = fs.readFileSync(fullPath, 'utf8');
-        const matterResult = matter(fileContents);
+    const idSet = new Set<string>();
+    for (const fileName of mdFiles) {
+        idSet.add(getBaseId(fileName));
+    }
 
-        const project: SpotlightData = {
+    const allProjects: BilingualSpotlightData[] = Array.from(idSet).map((id) => {
+        let vnData = parseSpotlightFile(path.join(spotlightDirectory, `${id}.vn.md`), id);
+        let enData = parseSpotlightFile(path.join(spotlightDirectory, `${id}.en.md`), id);
+        const legacyData = parseSpotlightFile(path.join(spotlightDirectory, `${id}.md`), id);
+
+        vnData = vnData || legacyData || enData || ({} as SpotlightData);
+        enData = enData || legacyData || vnData || ({} as SpotlightData);
+
+        const base = vnData.link ? vnData : enData;
+
+        return {
             id,
-            title: matterResult.data.title,
-            description: matterResult.data.description,
-            link: matterResult.data.link,
-            order: matterResult.data.order || 0,
+            link: base.link,
+            image: base.image,
+            order: base.order,
+            vn: vnData as SpotlightData,
+            en: enData as SpotlightData,
         };
-
-        // Omit optional fields when missing — Next.js cannot serialize `undefined`
-        if (matterResult.data.image) {
-            project.image = matterResult.data.image;
-        }
-
-        return project;
     });
 
     // Sort by order (lower first), then by title
@@ -54,6 +90,6 @@ export function getSpotlightProjects(): SpotlightData[] {
         if (a.order !== b.order) {
             return (a.order || 0) - (b.order || 0);
         }
-        return a.title.localeCompare(b.title);
+        return (a.en.title || '').localeCompare(b.en.title || '');
     });
 }

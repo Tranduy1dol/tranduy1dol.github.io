@@ -13,7 +13,6 @@ import rehypeHighlight from 'rehype-highlight';
 import GithubSlugger from 'github-slugger';
 import katex from 'katex';
 
-
 const postsDirectory = path.join(process.cwd(), '_posts');
 
 export type Heading = {
@@ -46,6 +45,14 @@ export type TagCount = {
     count: number;
 };
 
+export type BilingualPostData = {
+    slug: string[];
+    date: string;
+    tags?: string[];
+    vn: PostData;
+    en: PostData;
+};
+
 // Convert a string to a URL-friendly slug
 function slugify(text: string): string {
     return text
@@ -60,7 +67,9 @@ function buildSlug(filePath: string): string[] {
     const parts = relativePath.split(path.sep);
     // Last part is the filename, rest are folder names
     const folderParts = parts.slice(0, -1).map(slugify);
-    const fileName = parts[parts.length - 1].replace(/\.md$/, '');
+    let fileName = parts[parts.length - 1].replace(/\.md$/, '');
+    // Strip language suffix (.vn or .en)
+    fileName = fileName.replace(/\.(vn|en)$/, '');
     return [...folderParts, slugify(fileName)];
 }
 
@@ -118,54 +127,132 @@ function getAllMarkdownFiles(dir: string, tag: string | null = null): Array<{ fi
     return files;
 }
 
+// Extract language from filename
+function extractLanguage(filePath: string): 'vn' | 'en' | null {
+    if (filePath.endsWith('.vn.md')) return 'vn';
+    if (filePath.endsWith('.en.md')) return 'en';
+    return null;
+}
+
+// Extract the inline post metadata parsing into a reusable function
+function parsePostMetadata(filePath: string): PostData {
+    const fileName = path.basename(filePath);
+    const id = fileName.replace(/\.md$/, '').replace(/\.(vn|en)$/, '');
+    const slug = buildSlug(filePath);
+    const fileContents = fs.readFileSync(filePath, 'utf8');
+    const matterResult = matter(fileContents);
+    
+    const readTime = matterResult.data.readTime || calculateReadTime(matterResult.content);
+    
+    const tags: string[] = [];
+    if (matterResult.data.tags) {
+        const frontmatterTags = Array.isArray(matterResult.data.tags)
+            ? matterResult.data.tags
+            : [matterResult.data.tags];
+        tags.push(...frontmatterTags);
+    }
+    
+    const dateValue = matterResult.data.date;
+    const dateStr = dateValue instanceof Date
+        ? dateValue.toISOString().split('T')[0]
+        : dateValue;
+        
+    return {
+        id,
+        slug,
+        readTime,
+        tags,
+        date: dateStr as string,
+        title: matterResult.data.title as string,
+        excerpt: matterResult.data.excerpt as string | undefined,
+    };
+}
+
+// Same as parsePostMetadata but also compiles the markdown content
+async function compilePostContent(filePath: string): Promise<PostData> {
+    const baseMetadata = parsePostMetadata(filePath);
+    const fileContents = fs.readFileSync(filePath, 'utf8');
+    const matterResult = matter(fileContents);
+    
+    const headings = extractHeadings(matterResult.content);
+    const contentWithFixedImages = matterResult.content.replace(/!\[([^\]]*)\]\(public\/(.*?)\)/g, '![$1](/$2)');
+    
+    const processedContent = await unified()
+        .use(remarkParse)
+        .use(remarkGfm)
+        .use(remarkMath)
+        .use(remarkRehype)
+        .use(rehypeKatex)
+        // @ts-expect-error: Options type parameter is not explicitly provided in the library definition, causing a mismatch
+        .use(rehypeHighlight, { ignoreMissing: true })
+        .use(rehypeSlug)
+        .use(rehypeStringify)
+        .process(contentWithFixedImages);
+        
+    const contentHtml = processedContent.toString();
+    
+    const relatedPosts = matterResult.data.relatedPosts
+        ? getRelatedPosts(
+            Array.isArray(matterResult.data.relatedPosts)
+                ? matterResult.data.relatedPosts
+                : [matterResult.data.relatedPosts]
+        )
+        : [];
+        
+    return {
+        ...baseMetadata,
+        contentHtml,
+        headings,
+        relatedPosts,
+    };
+}
+
 // Gets and sorts all post data for the blog index page
-export function getSortedPostsData(): PostData[] {
+export function getSortedPostsData(): BilingualPostData[] {
     const allFiles = getAllMarkdownFiles(postsDirectory);
-
-    const allPostsData = allFiles.map(({ filePath }) => {
-        // Get id from filename
-        const fileName = path.basename(filePath);
-        const id = fileName.replace(/\.md$/, '');
-
-        // Build slug from file path
-        const slug = buildSlug(filePath);
-
-        // Read markdown file as string
-        const fileContents = fs.readFileSync(filePath, 'utf8');
-
-        // Use gray-matter to parse the post metadata section
-        const matterResult = matter(fileContents);
-
-        // Calculate read time if not provided
-        const readTime = matterResult.data.readTime || calculateReadTime(matterResult.content);
-
-        // Tags from frontmatter only
-        const tags: string[] = [];
-        if (matterResult.data.tags) {
-            const frontmatterTags = Array.isArray(matterResult.data.tags)
-                ? matterResult.data.tags
-                : [matterResult.data.tags];
-            tags.push(...frontmatterTags);
+    
+    // Group files by base slug
+    const grouped = new Map<string, { vn?: string; en?: string; fallback?: string }>();
+    for (const { filePath } of allFiles) {
+        const slugKey = buildSlug(filePath).join('/');
+        const lang = extractLanguage(filePath);
+        
+        let group = grouped.get(slugKey);
+        if (!group) {
+            group = {};
+            grouped.set(slugKey, group);
         }
-
-        // Convert Date objects to ISO strings for serialization
-        const dateValue = matterResult.data.date;
-        const dateStr = dateValue instanceof Date
-            ? dateValue.toISOString().split('T')[0]
-            : dateValue;
-
-        // Combine the data with the id
-        return {
-            id,
-            slug,
-            readTime,
-            tags,
-            date: dateStr as string,
-            title: matterResult.data.title as string,
-            excerpt: matterResult.data.excerpt as string | undefined,
-        };
-    });
-
+        
+        if (lang === 'vn') group.vn = filePath;
+        else if (lang === 'en') group.en = filePath;
+        else group.fallback = filePath;
+    }
+    
+    const allPostsData: BilingualPostData[] = [];
+    
+    for (const [, group] of grouped.entries()) {
+        const vnPath = group.vn || group.fallback || group.en;
+        const enPath = group.en || group.fallback || group.vn;
+        
+        if (!vnPath || !enPath) continue;
+        
+        const vnData = parsePostMetadata(vnPath);
+        const enData = parsePostMetadata(enPath);
+        
+        // Merge tags from both vn and en
+        const tagsSet = new Set<string>();
+        if (vnData.tags) vnData.tags.forEach(t => tagsSet.add(t));
+        if (enData.tags) enData.tags.forEach(t => tagsSet.add(t));
+        
+        allPostsData.push({
+            slug: vnData.slug,
+            date: vnData.date,
+            tags: Array.from(tagsSet),
+            vn: vnData,
+            en: enData,
+        });
+    }
+    
     // Sort posts by date
     return allPostsData.sort((a, b) => {
         if (a.date < b.date) {
@@ -197,38 +284,48 @@ export function getAllTags(): TagCount[] {
 // Gets all possible slugs for dynamic routing (catch-all [...slug])
 export function getAllPostSlugs() {
     const allFiles = getAllMarkdownFiles(postsDirectory);
-    return allFiles.map(({ filePath }) => {
+    const slugMap = new Map<string, string[]>();
+    
+    for (const { filePath } of allFiles) {
         const slug = buildSlug(filePath);
-        return {
-            params: {
-                slug,
-            },
-        };
-    });
+        const slugKey = slug.join('/');
+        if (!slugMap.has(slugKey)) {
+            slugMap.set(slugKey, slug);
+        }
+    }
+    
+    return Array.from(slugMap.values()).map(slug => ({
+        params: { slug },
+    }));
 }
 
-// Find a post file by slug array (searches recursively)
-function findPostFileBySlug(slug: string[]): string | null {
+// Find all language variants for a given slug
+function findPostFilesBySlug(slug: string[]): { vn?: string; en?: string; fallback?: string } {
     const allFiles = getAllMarkdownFiles(postsDirectory);
-    const found = allFiles.find(({ filePath }) => {
+    const result: { vn?: string; en?: string; fallback?: string } = {};
+    
+    for (const { filePath } of allFiles) {
         const fileSlug = buildSlug(filePath);
-        return fileSlug.length === slug.length && fileSlug.every((s, i) => s === slug[i]);
-    });
-    return found ? found.filePath : null;
+        if (fileSlug.length === slug.length && fileSlug.every((s, i) => s === slug[i])) {
+            const lang = extractLanguage(filePath);
+            if (lang === 'vn') result.vn = filePath;
+            else if (lang === 'en') result.en = filePath;
+            else result.fallback = filePath;
+        }
+    }
+    
+    return result;
 }
 
 export function getRelatedPosts(slugStrings: string[]): RelatedPost[] {
-    const allFiles = getAllMarkdownFiles(postsDirectory);
-
     return slugStrings
         .map((slugStr) => {
             const targetSlug = slugStr.split('/').map(slugify);
-            const found = allFiles.find(({ filePath }) => {
-                const fileSlug = buildSlug(filePath);
-                return fileSlug.length === targetSlug.length && fileSlug.every((s, i) => s === targetSlug[i]);
-            });
-            if (!found) return null;
-            const content = fs.readFileSync(found.filePath, 'utf8');
+            const files = findPostFilesBySlug(targetSlug);
+            const targetPath = files.vn || files.fallback || files.en;
+            if (!targetPath) return null;
+            
+            const content = fs.readFileSync(targetPath, 'utf8');
             const { data } = matter(content);
             return { title: data.title as string, slug: targetSlug };
         })
@@ -236,80 +333,29 @@ export function getRelatedPosts(slugStrings: string[]): RelatedPost[] {
 }
 
 // Gets the full data for a single post, including HTML content
-export async function getPostData(slug: string[]): Promise<PostData> {
-    const filePath = findPostFileBySlug(slug);
-    if (!filePath) {
+export async function getPostData(slug: string[]): Promise<BilingualPostData> {
+    const files = findPostFilesBySlug(slug);
+    
+    const vnPath = files.vn || files.fallback || files.en;
+    const enPath = files.en || files.fallback || files.vn;
+    
+    if (!vnPath || !enPath) {
         throw new Error(`Post not found: ${slug.join('/')}`);
     }
+    
+    const vnData = await compilePostContent(vnPath);
+    const enData = await compilePostContent(enPath);
+    
+    // Merge tags from both vn and en
+    const tagsSet = new Set<string>();
+    if (vnData.tags) vnData.tags.forEach(t => tagsSet.add(t));
+    if (enData.tags) enData.tags.forEach(t => tagsSet.add(t));
 
-    const fileContents = fs.readFileSync(filePath, 'utf8');
-
-    // Get id from filename
-    const fileName = path.basename(filePath);
-    const id = fileName.replace(/\.md$/, '');
-
-    // Use gray-matter to parse the post metadata section
-    const matterResult = matter(fileContents);
-
-    // Extract headings from markdown before processing
-    const headings = extractHeadings(matterResult.content);
-
-    // Replace `public/` prefix in markdown image links so they work in both Obsidian (which needs public/) and Next.js (which serves from /)
-    const contentWithFixedImages = matterResult.content.replace(/!\[([^\]]*)\]\(public\/(.*?)\)/g, '![$1](/$2)');
-
-    // Use unified pipeline to convert markdown into HTML with math support
-    const processedContent = await unified()
-        .use(remarkParse)
-        .use(remarkGfm)
-        .use(remarkMath)
-        .use(remarkRehype)
-        .use(rehypeKatex)
-        // @ts-expect-error: Options type parameter is not explicitly provided in the library definition, causing a mismatch
-        .use(rehypeHighlight, { ignoreMissing: true })
-        .use(rehypeSlug)
-        .use(rehypeStringify)
-        .process(contentWithFixedImages);
-
-    const contentHtml = processedContent.toString();
-
-    // Calculate read time if not provided
-    const readTime = matterResult.data.readTime || calculateReadTime(matterResult.content);
-
-    // Tags from frontmatter only
-    const tags: string[] = [];
-    if (matterResult.data.tags) {
-        const frontmatterTags = Array.isArray(matterResult.data.tags)
-            ? matterResult.data.tags
-            : [matterResult.data.tags];
-        tags.push(...frontmatterTags);
-    }
-
-    // Convert Date objects to ISO strings for serialization
-    const dateValue = matterResult.data.date;
-    const dateStr = dateValue instanceof Date
-        ? dateValue.toISOString().split('T')[0]
-        : dateValue;
-
-    // Resolve related posts from frontmatter
-    const relatedPosts = matterResult.data.relatedPosts
-        ? getRelatedPosts(
-            Array.isArray(matterResult.data.relatedPosts)
-                ? matterResult.data.relatedPosts
-                : [matterResult.data.relatedPosts]
-        )
-        : [];
-
-    // Combine the data with the id and contentHtml
     return {
-        id,
-        slug,
-        contentHtml,
-        readTime,
-        headings,
-        tags,
-        relatedPosts,
-        date: dateStr as string,
-        title: matterResult.data.title as string,
-        excerpt: matterResult.data.excerpt as string | undefined,
+        slug: vnData.slug,
+        date: vnData.date,
+        tags: Array.from(tagsSet),
+        vn: vnData,
+        en: enData,
     };
 }

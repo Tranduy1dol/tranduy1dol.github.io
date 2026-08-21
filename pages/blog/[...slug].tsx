@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { FiArrowLeft } from 'react-icons/fi';
 import dynamic from 'next/dynamic';
 import { useTheme } from 'next-themes';
+import { useLanguage } from '@/lib/LanguageContext';
 
 const Comments = dynamic(() => import('@/components/Comments'), {
     ssr: false,
@@ -12,10 +13,10 @@ const Comments = dynamic(() => import('@/components/Comments'), {
 
 
 
-import { getAllPostSlugs, getPostData, PostData } from '@/lib/posts';
+import { getAllPostSlugs, getPostData, BilingualPostData } from '@/lib/posts';
 
 type PostProps = {
-    postData: PostData;
+    postData: BilingualPostData;
 };
 
 const Post: NextPage<PostProps> = ({ postData }) => {
@@ -23,6 +24,10 @@ const Post: NextPage<PostProps> = ({ postData }) => {
     const [commentCount, setCommentCount] = useState(0);
     const [copied, setCopied] = useState(false);
     const { resolvedTheme } = useTheme();
+    const { language } = useLanguage();
+
+    // Get the active language variant
+    const post = postData[language];
 
     // Listen for Giscus metadata to get reaction + comment counts
     useEffect(() => {
@@ -77,7 +82,7 @@ const Post: NextPage<PostProps> = ({ postData }) => {
         }, 100);
 
         return () => clearTimeout(timeoutId);
-    }, [postData.contentHtml, resolvedTheme]);
+    }, [post.contentHtml, resolvedTheme, language]);
 
     const scrollToReactions = () => {
         const commentSection = document.getElementById('comments-section');
@@ -113,13 +118,13 @@ const Post: NextPage<PostProps> = ({ postData }) => {
     };
 
     // Use headings extracted from markdown
-    const headings = postData.headings || [];
+    const headings = post.headings || [];
 
     return (
         <>
             <Head>
-                <title>{`${postData.title} - tranduy1dol`}</title>
-                <meta name="description" content={postData.excerpt} />
+                <title>{`${post.title} - tranduy1dol`}</title>
+                <meta name="description" content={post.excerpt} />
             </Head>
 
             <div className="max-w-7xl mx-auto px-6 py-12">
@@ -212,13 +217,13 @@ const Post: NextPage<PostProps> = ({ postData }) => {
                             >
                                 {formatDate(postData.date)}
                             </time>
-                            <h1 className="mb-6">{postData.title}</h1>
-                            {postData.excerpt && (
+                            <h1 className="mb-6">{post.title}</h1>
+                            {post.excerpt && (
                                 <p
                                     className="text-lg leading-relaxed"
                                     style={{ color: 'rgb(var(--color-text-muted))' }}
                                 >
-                                    {postData.excerpt}
+                                    {post.excerpt}
                                 </p>
                             )}
                         </header>
@@ -230,19 +235,19 @@ const Post: NextPage<PostProps> = ({ postData }) => {
                         >
                             <div
                                 className="prose max-w-none"
-                                dangerouslySetInnerHTML={{ __html: postData.contentHtml! }}
+                                dangerouslySetInnerHTML={{ __html: post.contentHtml! }}
                             />
                         </div>
 
                         {/* Related Reading */}
-                        {postData.relatedPosts && postData.relatedPosts.length > 0 && (
+                        {post.relatedPosts && post.relatedPosts.length > 0 && (
                             <div
                                 className="border-t-2 mt-12 pt-8"
                                 style={{ borderColor: 'rgb(var(--color-border))' }}
                             >
                                 <h4 className="mb-4">Related Reading</h4>
                                 <ul className="space-y-2">
-                                    {postData.relatedPosts.map((related) => (
+                                    {post.relatedPosts.map((related) => (
                                         <li key={related.slug.join('/')}>
                                             <Link
                                                 href={`/blog/${related.slug.join('/')}`}

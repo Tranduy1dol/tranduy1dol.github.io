@@ -19,6 +19,16 @@ export type BookData = {
     contentHtml?: string;
 };
 
+export type BilingualBookData = {
+    id: string;
+    cover: string;
+    rating?: number;
+    dateRead?: string;
+    status?: 'reading' | 'completed' | 'want-to-read';
+    vn: BookData;
+    en: BookData;
+};
+
 // Ensure books directory exists
 function ensureBooksDirectory() {
     if (!fs.existsSync(booksDirectory)) {
@@ -26,8 +36,40 @@ function ensureBooksDirectory() {
     }
 }
 
+export function extractLanguage(fileName: string): 'vn' | 'en' | null {
+    if (fileName.endsWith('.vn.md')) return 'vn';
+    if (fileName.endsWith('.en.md')) return 'en';
+    return null;
+}
+
+export function getBaseId(fileName: string): string {
+    return fileName.replace(/\.vn\.md$/, '').replace(/\.en\.md$/, '').replace(/\.md$/, '');
+}
+
+function parseBookFile(fullPath: string, id: string): BookData | null {
+    if (!fs.existsSync(fullPath)) return null;
+    const fileContents = fs.readFileSync(fullPath, 'utf8');
+    const matterResult = matter(fileContents);
+
+    // Convert Date objects to ISO strings for serialization
+    const dateRead = matterResult.data.dateRead;
+    const dateReadStr = dateRead instanceof Date
+        ? dateRead.toISOString().split('T')[0]
+        : dateRead;
+
+    return {
+        id,
+        title: matterResult.data.title as string,
+        author: matterResult.data.author as string,
+        cover: matterResult.data.cover as string,
+        rating: matterResult.data.rating as number | undefined,
+        dateRead: dateReadStr as string | undefined,
+        status: matterResult.data.status as 'reading' | 'completed' | 'want-to-read' | undefined,
+    };
+}
+
 // Gets and sorts all book data for the books page
-export function getSortedBooksData(): BookData[] {
+export function getSortedBooksData(): BilingualBookData[] {
     ensureBooksDirectory();
 
     const fileNames = fs.readdirSync(booksDirectory);
@@ -37,26 +79,29 @@ export function getSortedBooksData(): BookData[] {
         return [];
     }
 
-    const allBooksData = mdFiles.map((fileName) => {
-        const id = fileName.replace(/\.md$/, '');
-        const fullPath = path.join(booksDirectory, fileName);
-        const fileContents = fs.readFileSync(fullPath, 'utf8');
-        const matterResult = matter(fileContents);
+    const idSet = new Set<string>();
+    for (const fileName of mdFiles) {
+        idSet.add(getBaseId(fileName));
+    }
 
-        // Convert Date objects to ISO strings for serialization
-        const dateRead = matterResult.data.dateRead;
-        const dateReadStr = dateRead instanceof Date
-            ? dateRead.toISOString().split('T')[0]
-            : dateRead;
+    const allBooksData: BilingualBookData[] = Array.from(idSet).map((id) => {
+        let vnData = parseBookFile(path.join(booksDirectory, `${id}.vn.md`), id);
+        let enData = parseBookFile(path.join(booksDirectory, `${id}.en.md`), id);
+        const legacyData = parseBookFile(path.join(booksDirectory, `${id}.md`), id);
+
+        vnData = vnData || legacyData || enData || ({} as BookData);
+        enData = enData || legacyData || vnData || ({} as BookData);
+
+        const base = vnData.cover ? vnData : enData;
 
         return {
             id,
-            title: matterResult.data.title as string,
-            author: matterResult.data.author as string,
-            cover: matterResult.data.cover as string,
-            rating: matterResult.data.rating as number | undefined,
-            dateRead: dateReadStr as string | undefined,
-            status: matterResult.data.status as 'reading' | 'completed' | 'want-to-read' | undefined,
+            cover: base.cover,
+            rating: base.rating,
+            dateRead: base.dateRead,
+            status: base.status,
+            vn: vnData as BookData,
+            en: enData as BookData,
         };
     });
 
@@ -67,7 +112,7 @@ export function getSortedBooksData(): BookData[] {
         }
         if (a.dateRead) return -1;
         if (b.dateRead) return 1;
-        return a.title.localeCompare(b.title);
+        return (a.en.title || '').localeCompare(b.en.title || '');
     });
 }
 
@@ -77,23 +122,17 @@ export function getAllBookIds() {
 
     const fileNames = fs.readdirSync(booksDirectory);
     const mdFiles = fileNames.filter(file => file.endsWith('.md'));
-
-    return mdFiles.map((fileName) => {
-        return {
-            params: {
-                id: fileName.replace(/\.md$/, ''),
-            },
-        };
-    });
+    
+    const idSet = new Set<string>();
+    for (const fileName of mdFiles) {
+        idSet.add(getBaseId(fileName));
+    }
+    
+    return Array.from(idSet).map(id => ({ params: { id } }));
 }
 
-// Gets the full data for a single book, including HTML content
-export async function getBookData(id: string): Promise<BookData> {
-    const fullPath = path.join(booksDirectory, `${id}.md`);
-    const fileContents = fs.readFileSync(fullPath, 'utf8');
-
-    const matterResult = matter(fileContents);
-
+async function processContent(matterResult: matter.GrayMatterFile<string>): Promise<string> {
+    if (!matterResult || !matterResult.content) return '';
     // Use remark to convert markdown into HTML string
     const processedContent = await remark()
         .use(html)
@@ -104,9 +143,16 @@ export async function getBookData(id: string): Promise<BookData> {
         .use(rehypeSlug)
         .process(processedContent.toString());
 
-    const contentHtml = contentWithIds.toString();
+    return contentWithIds.toString();
+}
 
-    // Convert Date objects to ISO strings for serialization
+async function getBookVariant(fullPath: string, id: string): Promise<BookData | null> {
+    if (!fs.existsSync(fullPath)) return null;
+    const fileContents = fs.readFileSync(fullPath, 'utf8');
+    const matterResult = matter(fileContents);
+
+    const contentHtml = await processContent(matterResult);
+
     const dateRead = matterResult.data.dateRead;
     const dateReadStr = dateRead instanceof Date
         ? dateRead.toISOString().split('T')[0]
@@ -121,5 +167,27 @@ export async function getBookData(id: string): Promise<BookData> {
         rating: matterResult.data.rating as number | undefined,
         dateRead: dateReadStr as string | undefined,
         status: matterResult.data.status as 'reading' | 'completed' | 'want-to-read' | undefined,
+    };
+}
+
+// Gets the full data for a single book, including HTML content
+export async function getBookData(id: string): Promise<BilingualBookData> {
+    let vnData = await getBookVariant(path.join(booksDirectory, `${id}.vn.md`), id);
+    let enData = await getBookVariant(path.join(booksDirectory, `${id}.en.md`), id);
+    const legacyData = await getBookVariant(path.join(booksDirectory, `${id}.md`), id);
+
+    vnData = vnData || legacyData || enData || ({} as BookData);
+    enData = enData || legacyData || vnData || ({} as BookData);
+
+    const base = vnData.cover ? vnData : enData;
+
+    return {
+        id,
+        cover: base.cover,
+        rating: base.rating,
+        dateRead: base.dateRead,
+        status: base.status,
+        vn: vnData as BookData,
+        en: enData as BookData,
     };
 }

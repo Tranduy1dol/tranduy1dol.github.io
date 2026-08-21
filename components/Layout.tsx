@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
 import { LuCake } from 'react-icons/lu';
+import { useLanguage } from '@/lib/LanguageContext';
 
 type LayoutProps = {
     children: React.ReactNode;
@@ -10,6 +11,7 @@ type LayoutProps = {
 
 const Layout = ({ children }: LayoutProps) => {
     const { theme, setTheme } = useTheme();
+    const { language, setLanguage, mounted: langMounted } = useLanguage();
     const [mounted, setMounted] = useState(false);
 
     // Avoid hydration mismatch
@@ -48,6 +50,23 @@ const Layout = ({ children }: LayoutProps) => {
                                 )}
                                 {currentDate}
                             </time>
+                            {/* Language Toggle */}
+                            {mounted && langMounted ? (
+                                <button
+                                    onClick={() => setLanguage(language === 'vn' ? 'en' : 'vn')}
+                                    className="px-2 py-1 text-sm hover:opacity-70 transition-opacity border rounded"
+                                    style={{ borderColor: 'rgb(var(--color-border))' }}
+                                    aria-label="Toggle language"
+                                    title={language === 'vn' ? 'Switch to English' : 'Chuyển sang Tiếng Việt'}
+                                >
+                                    {language === 'vn' ? '🇻🇳 VN' : '🇬🇧 EN'}
+                                </button>
+                            ) : (
+                                <span className="px-2 py-1 text-sm border rounded invisible" aria-hidden="true">
+                                    🇻🇳 VN
+                                </span>
+                            )}
+                            {/* Dark Mode Toggle */}
                             {mounted ? (
                                 <button
                                     onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}

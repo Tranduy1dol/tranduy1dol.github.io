@@ -2,14 +2,18 @@ import type { GetStaticProps, GetStaticPaths, NextPage } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
 import Image from 'next/image';
-import { getAllBookIds, getBookData, BookData } from '@/lib/books';
+import { getAllBookIds, getBookData, BilingualBookData } from '@/lib/books';
+import { useLanguage } from '@/lib/LanguageContext';
 import { FiArrowLeft } from 'react-icons/fi';
 
 type BookDetailProps = {
-    bookData: BookData;
+    bookData: BilingualBookData;
 };
 
 const BookDetail: NextPage<BookDetailProps> = ({ bookData }) => {
+    const { language } = useLanguage();
+    const book = bookData[language];
+
     // Render star rating
     const renderRating = (rating?: number) => {
         if (!rating) return null;
@@ -30,8 +34,8 @@ const BookDetail: NextPage<BookDetailProps> = ({ bookData }) => {
     return (
         <div className="max-w-7xl mx-auto px-6">
             <Head>
-                <title>{`${bookData.title} - tranduy1dol`}</title>
-                <meta name="description" content={`Book review: ${bookData.title} by ${bookData.author}`} />
+                <title>{`${book.title} - tranduy1dol`}</title>
+                <meta name="description" content={`Book review: ${book.title} by ${book.author}`} />
             </Head>
 
             {/* Back Link */}
@@ -57,7 +61,7 @@ const BookDetail: NextPage<BookDetailProps> = ({ bookData }) => {
                         <div className="aspect-[2/3] relative">
                             <Image
                                 src={bookData.cover}
-                                alt={bookData.title}
+                                alt={book.title}
                                 fill
                                 className="object-cover"
                                 sizes="300px"
@@ -71,13 +75,13 @@ const BookDetail: NextPage<BookDetailProps> = ({ bookData }) => {
                                     fontFamily: 'var(--font-serif)'
                                 }}
                             >
-                                {bookData.title}
+                                {book.title}
                             </h3>
                             <p
                                 className="text-sm mb-4"
                                 style={{ color: 'rgb(var(--color-text-muted))' }}
                             >
-                                by {bookData.author}
+                                by {book.author}
                             </p>
                             {bookData.rating && (
                                 <div className="mb-4">
@@ -103,11 +107,11 @@ const BookDetail: NextPage<BookDetailProps> = ({ bookData }) => {
                             className="text-3xl md:text-4xl mb-4"
                             style={{ fontFamily: 'var(--font-serif)' }}
                         >
-                            {bookData.title}
+                            {book.title}
                         </h1>
                         <div className="flex items-center gap-4 flex-wrap">
                             <span style={{ color: 'rgb(var(--color-text-muted))' }}>
-                                by {bookData.author}
+                                by {book.author}
                             </span>
                             {bookData.dateRead && (
                                 <>
@@ -134,7 +138,7 @@ const BookDetail: NextPage<BookDetailProps> = ({ bookData }) => {
                     >
                         <div
                             className="prose max-w-none"
-                            dangerouslySetInnerHTML={{ __html: bookData.contentHtml! }}
+                            dangerouslySetInnerHTML={{ __html: book.contentHtml! }}
                         />
                     </div>
                 </article>
