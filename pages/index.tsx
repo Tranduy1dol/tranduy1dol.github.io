@@ -140,7 +140,7 @@ const Home: NextPage<HomeProps> = ({ allPostsData, allTags, allBooksData, spotli
                         </div>
 
                         {/* Social Links */}
-                        <div className="flex gap-3 flex-wrap items-center">
+                        <div className="flex gap-2 flex-nowrap items-center">
                             {socialLinks.map((social) => {
                                 const Icon = social.icon;
                                 const isCV = 'isCV' in social && social.isCV;
@@ -150,14 +150,14 @@ const Home: NextPage<HomeProps> = ({ allPostsData, allTags, allBooksData, spotli
                                         href={social.href}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className={`border-2 transition-all hover:opacity-70 ${isCV ? 'inline-flex items-center gap-2 px-3 py-2' : 'p-2'}`}
+                                        className={`border-2 transition-all hover:opacity-70 shrink-0 ${isCV ? 'inline-flex items-center gap-1.5 px-2 py-2' : 'p-2'}`}
                                         style={{ borderColor: 'rgb(var(--color-border))' }}
                                         aria-label={isCV ? 'See CV' : social.label}
                                         title={isCV ? 'See CV' : social.label}
                                     >
                                         <Icon className="w-4 h-4" />
                                         {isCV && (
-                                            <span className="text-xs uppercase tracking-wider">
+                                            <span className="text-xs uppercase tracking-wide whitespace-nowrap">
                                                 See CV
                                             </span>
                                         )}
