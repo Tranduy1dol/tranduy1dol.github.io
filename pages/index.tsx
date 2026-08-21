@@ -8,7 +8,7 @@ import { getSortedBooksData, BilingualBookData } from '@/lib/books';
 import { getSpotlightProjects, BilingualSpotlightData } from '@/lib/spotlight';
 import { TechStack } from '@/components/TechStack';
 import { useLanguage } from '@/lib/LanguageContext';
-import { FiGithub, FiTwitter, FiLinkedin, FiMail, FiDownload, FiExternalLink } from 'react-icons/fi';
+import { FiGithub, FiLinkedin, FiMail, FiDownload, FiExternalLink } from 'react-icons/fi';
 
 import fs from 'fs';
 import path from 'path';
@@ -18,7 +18,6 @@ import html from 'remark-html';
 
 const socialLinks = [
     { icon: FiGithub, href: 'https://github.com/tranduy1dol', label: 'GitHub' },
-    { icon: FiTwitter, href: 'https://twitter.com/tranduy1dol', label: 'Twitter' },
     { icon: FiLinkedin, href: 'https://linkedin.com/in/tranduy1dol', label: 'LinkedIn' },
     { icon: FiMail, href: 'mailto:contact@tranduy1dol.com', label: 'Email' },
     { icon: FiDownload, href: '/cv.pdf', label: 'CV', isCV: true },
@@ -141,22 +140,27 @@ const Home: NextPage<HomeProps> = ({ allPostsData, allTags, allBooksData, spotli
                         </div>
 
                         {/* Social Links */}
-                        <div className="flex gap-3 flex-wrap">
+                        <div className="flex gap-3 flex-wrap items-center">
                             {socialLinks.map((social) => {
                                 const Icon = social.icon;
-                                const isExternal = !('isCV' in social);
+                                const isCV = 'isCV' in social && social.isCV;
                                 return (
                                     <a
                                         key={social.label}
                                         href={social.href}
-                                        target={isExternal ? '_blank' : '_blank'}
+                                        target="_blank"
                                         rel="noopener noreferrer"
-                                        className="p-2 border-2 transition-all hover:opacity-70"
+                                        className={`border-2 transition-all hover:opacity-70 ${isCV ? 'inline-flex items-center gap-2 px-3 py-2' : 'p-2'}`}
                                         style={{ borderColor: 'rgb(var(--color-border))' }}
-                                        aria-label={social.label}
-                                        title={social.label}
+                                        aria-label={isCV ? 'See CV' : social.label}
+                                        title={isCV ? 'See CV' : social.label}
                                     >
                                         <Icon className="w-4 h-4" />
+                                        {isCV && (
+                                            <span className="text-xs uppercase tracking-wider">
+                                                See CV
+                                            </span>
+                                        )}
                                     </a>
                                 );
                             })}
