@@ -32,7 +32,7 @@ const BookDetail: NextPage<BookDetailProps> = ({ bookData }) => {
     };
 
     return (
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-6 pt-16 pb-12">
             <Head>
                 <title>{`${book.title} - tranduy1dol`}</title>
                 <meta name="description" content={`Book review: ${book.title} by ${book.author}`} />

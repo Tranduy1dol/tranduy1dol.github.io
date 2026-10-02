@@ -13,6 +13,7 @@ export type BookData = {
     title: string;
     author: string;
     cover: string;
+    tags: string[];
     rating?: number;
     dateRead?: string;
     status?: 'reading' | 'completed' | 'want-to-read';
@@ -22,6 +23,7 @@ export type BookData = {
 export type BilingualBookData = {
     id: string;
     cover: string;
+    tags: string[];
     rating?: number;
     dateRead?: string;
     status?: 'reading' | 'completed' | 'want-to-read';
@@ -46,6 +48,12 @@ export function getBaseId(fileName: string): string {
     return fileName.replace(/\.vn\.md$/, '').replace(/\.en\.md$/, '').replace(/\.md$/, '');
 }
 
+function parseTags(tags: unknown): string[] {
+    return [...new Set((Array.isArray(tags) ? tags : [tags])
+        .filter((tag): tag is string => typeof tag === 'string' && tag.trim().length > 0)
+        .map(tag => tag.trim()))];
+}
+
 function parseBookFile(fullPath: string, id: string): BookData | null {
     if (!fs.existsSync(fullPath)) return null;
     const fileContents = fs.readFileSync(fullPath, 'utf8');
@@ -61,7 +69,8 @@ function parseBookFile(fullPath: string, id: string): BookData | null {
         id,
         title: matterResult.data.title as string,
         author: matterResult.data.author as string,
-        cover: matterResult.data.cover as string,
+        cover: (matterResult.data.cover as string).replace(/^\[\[(.*?)\]\]$/, '/$1'),
+        tags: parseTags(matterResult.data.tags),
         rating: matterResult.data.rating as number | undefined,
         dateRead: dateReadStr as string | undefined,
         status: matterResult.data.status as 'reading' | 'completed' | 'want-to-read' | undefined,
@@ -97,6 +106,7 @@ export function getSortedBooksData(): BilingualBookData[] {
         return {
             id,
             cover: base.cover,
+            tags: [...new Set([...vnData.tags, ...enData.tags])],
             rating: base.rating,
             dateRead: base.dateRead,
             status: base.status,
@@ -163,7 +173,8 @@ async function getBookVariant(fullPath: string, id: string): Promise<BookData | 
         contentHtml,
         title: matterResult.data.title as string,
         author: matterResult.data.author as string,
-        cover: matterResult.data.cover as string,
+        cover: (matterResult.data.cover as string).replace(/^\[\[(.*?)\]\]$/, '/$1'),
+        tags: parseTags(matterResult.data.tags),
         rating: matterResult.data.rating as number | undefined,
         dateRead: dateReadStr as string | undefined,
         status: matterResult.data.status as 'reading' | 'completed' | 'want-to-read' | undefined,
@@ -184,6 +195,7 @@ export async function getBookData(id: string): Promise<BilingualBookData> {
     return {
         id,
         cover: base.cover,
+        tags: [...new Set([...vnData.tags, ...enData.tags])],
         rating: base.rating,
         dateRead: base.dateRead,
         status: base.status,

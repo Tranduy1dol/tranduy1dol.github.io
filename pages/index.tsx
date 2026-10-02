@@ -37,7 +37,16 @@ const Home: NextPage<HomeProps> = ({ allPostsData, allTags, allBooksData, spotli
     const [activeTab, setActiveTab] = useState<ActiveTab>('blog');
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedTag, setSelectedTag] = useState<string | null>(null);
+    const [selectedBookTag, setSelectedBookTag] = useState<string | null>(null);
     const { language } = useLanguage();
+    const bookGroups = new Map<string, BilingualBookData[]>();
+    for (const book of allBooksData) {
+        for (const tag of book.tags.length ? book.tags : ['Untagged']) {
+            if (!bookGroups.has(tag)) bookGroups.set(tag, []);
+            bookGroups.get(tag)!.push(book);
+        }
+    }
+    const sortedBookGroups = [...bookGroups].sort(([a], [b]) => a.localeCompare(b));
 
     const formatDate = (dateStr: string) => {
         const date = new Date(dateStr);
@@ -203,6 +212,24 @@ const Home: NextPage<HomeProps> = ({ allPostsData, allTags, allBooksData, spotli
                                 ))}
                             </ul>
                         </div>
+                        <nav aria-label="Book tags">
+                            <h4 className="mb-3">Book Tags</h4>
+                            <ul className="space-y-2">
+                                {[{ tag: null, count: allBooksData.length }, ...sortedBookGroups.map(([tag, books]) => ({ tag, count: books.length }))].map(({ tag, count }) => (
+                                    <li key={tag ?? 'all-books'}>
+                                        <button
+                                            onClick={() => { setSelectedBookTag(tag); setActiveTab('book'); }}
+                                            aria-pressed={selectedBookTag === tag}
+                                            className={`text-sm flex justify-between items-center group w-full text-left ${selectedBookTag === tag ? 'font-bold' : ''}`}
+                                            style={{ color: 'rgb(var(--color-text-muted))' }}
+                                        >
+                                            <span className="group-hover:underline">{tag ?? 'All'}</span>
+                                            <span>({count})</span>
+                                        </button>
+                                    </li>
+                                ))}
+                            </ul>
+                        </nav>
                     </aside>
 
                     {/* ========== CENTER COLUMN ========== */}
@@ -370,62 +397,72 @@ const Home: NextPage<HomeProps> = ({ allPostsData, allTags, allBooksData, spotli
                                         No books yet. Add markdown files to the <code>_books</code> folder.
                                     </p>
                                 ) : (
-                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                                        {allBooksData.map((bilingualBook) => {
-                                            const book = bilingualBook[language];
-                                            return (
-                                                <Link
-                                                    key={bilingualBook.id}
-                                                    href={`/books/${bilingualBook.id}`}
-                                                    className="group no-underline h-full"
-                                                >
-                                                    <div
-                                                        className="border-2 overflow-hidden hover:shadow-lg transition-shadow h-full flex flex-col"
-                                                        style={{
-                                                            borderColor: 'rgb(var(--color-border))',
-                                                            backgroundColor: 'rgb(var(--color-surface))'
-                                                        }}
-                                                    >
-                                                        {/* Book Cover - 2:3 aspect ratio */}
-                                                        <div
-                                                            className="aspect-[2/3] overflow-hidden border-b-2 flex-shrink-0 relative"
-                                                            style={{ borderColor: 'rgb(var(--color-border))' }}
+                                    <div className="space-y-8">
+                                        {sortedBookGroups.filter(([tag]) => selectedBookTag === null || selectedBookTag === tag).map(([tag, books]) => (
+                                            <section key={tag} aria-label={tag}>
+                                                <div className="flex items-center gap-3 mb-4">
+                                                    <h3 style={{ fontFamily: 'var(--font-serif)' }}>{tag}</h3>
+                                                    <div className="flex-1 h-[2px]" style={{ backgroundColor: 'rgb(var(--color-border))' }} />
+                                                </div>
+                                                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                                {books.map((bilingualBook) => {
+                                                    const book = bilingualBook[language];
+                                                    return (
+                                                        <Link
+                                                            key={bilingualBook.id}
+                                                            href={`/books/${bilingualBook.id}`}
+                                                            className="group no-underline h-full"
                                                         >
-                                                            <Image
-                                                                src={bilingualBook.cover}
-                                                                alt={book.title}
-                                                                fill
-                                                                className="object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
-                                                                sizes="(max-width: 768px) 50vw, 33vw"
-                                                            />
-                                                        </div>
-                                                        {/* Book Info */}
-                                                        <div className="p-3 flex-1 flex flex-col">
-                                                            <h3
-                                                                className="text-sm leading-tight mb-1 group-hover:opacity-70 transition-opacity"
-                                                                style={{ fontFamily: 'var(--font-serif)' }}
+                                                            <div
+                                                                className="border-2 overflow-hidden hover:shadow-lg transition-shadow h-full flex flex-col"
+                                                                style={{
+                                                                    borderColor: 'rgb(var(--color-border))',
+                                                                    backgroundColor: 'rgb(var(--color-surface))'
+                                                                }}
                                                             >
-                                                                {book.title}
-                                                            </h3>
-                                                            <p
-                                                                className="text-xs mb-1"
-                                                                style={{ color: 'rgb(var(--color-text-muted))' }}
-                                                            >
-                                                                by {book.author}
-                                                            </p>
-                                                            {bilingualBook.rating && (
+                                                                {/* Book Cover - 2:3 aspect ratio */}
                                                                 <div
-                                                                    className="text-xs mt-auto"
-                                                                    style={{ color: 'rgb(var(--color-text-muted))' }}
+                                                                    className="aspect-[2/3] overflow-hidden border-b-2 flex-shrink-0 relative"
+                                                                    style={{ borderColor: 'rgb(var(--color-border))' }}
                                                                 >
-                                                                    {renderRating(bilingualBook.rating)}
+                                                                    <Image
+                                                                        src={bilingualBook.cover}
+                                                                        alt={book.title}
+                                                                        fill
+                                                                        className="object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
+                                                                        sizes="(max-width: 768px) 50vw, 33vw"
+                                                                    />
                                                                 </div>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                </Link>
-                                            );
-                                        })}
+                                                                {/* Book Info */}
+                                                                <div className="p-3 flex-1 flex flex-col">
+                                                                    <h3
+                                                                        className="text-sm leading-tight mb-1 group-hover:opacity-70 transition-opacity"
+                                                                        style={{ fontFamily: 'var(--font-serif)' }}
+                                                                    >
+                                                                        {book.title}
+                                                                    </h3>
+                                                                    <p
+                                                                        className="text-xs mb-1"
+                                                                        style={{ color: 'rgb(var(--color-text-muted))' }}
+                                                                    >
+                                                                        by {book.author}
+                                                                    </p>
+                                                                    {bilingualBook.rating && (
+                                                                        <div
+                                                                            className="text-xs mt-auto"
+                                                                            style={{ color: 'rgb(var(--color-text-muted))' }}
+                                                                        >
+                                                                            {renderRating(bilingualBook.rating)}
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        </Link>
+                                                    );
+                                                })}
+                                                </div>
+                                            </section>
+                                        ))}
                                     </div>
                                 )}
                             </div>

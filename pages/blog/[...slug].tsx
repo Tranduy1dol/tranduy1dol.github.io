@@ -127,7 +127,7 @@ const Post: NextPage<PostProps> = ({ postData }) => {
                 <meta name="description" content={post.excerpt} />
             </Head>
 
-            <div className="max-w-7xl mx-auto px-6 py-12">
+            <div className="max-w-7xl mx-auto px-6 pt-16 pb-12">
                 {/* Back Link */}
                 <Link
                     href="/"
