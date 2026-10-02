@@ -5,4 +5,7 @@ cover: https://down-vn.img.susercontent.com/file/vn-11134207-820l4-mhivhi7ydpfq1
 rating: 5
 dateRead: 2025-09-05
 status: completed
+tags:
+  - philosophy
 ---
+Mình sẽ review vào một ngày không xa.

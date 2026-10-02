@@ -5,4 +5,7 @@ cover: https://product.hstatic.net/200000845405/product/p86596mscan0001_9f1f68d8
 rating: 5
 dateRead: 2025-05-06
 status: completed
+tags:
+  - psychology
 ---
+Mình sẽ review vào một ngày không xa.
